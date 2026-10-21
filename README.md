@@ -1,36 +1,72 @@
 # value-lineage
 
-Published as `@gabrielvfonseca/value-lineage` on GitHub Packages.
+**How did this value get into this state?**
 
-A debugging library that records how values flow through array pipelines and explains where an
-unexpected result came from. The published package is documented in
-[`packages/explain/README.md`](packages/explain/README.md).
+`@gabrielvfonseca/value-lineage` records how elements flow through an array pipeline. When the
+result looks wrong, it reports the step that caused it and the elements that step removed.
 
-## Monorepo
+```ts
+import { trace } from "@gabrielvfonseca/value-lineage";
 
-| Path                | What it is                                                           |
-| ------------------- | -------------------------------------------------------------------- |
-| `packages/explain`  | The library, published to npm as `explain`                           |
-| `packages/corpus`   | Ten realistic pipeline bugs that the library must diagnose (private) |
-| `apps/playground`   | Runnable examples (private)                                          |
-| `packages/tsconfig` | Shared TypeScript configuration (private)                            |
+const total = trace("order.total", order.items, (items) =>
+  items.filter(isAvailable).map(getPrice).reduce((a, b) => a + b, 0),
+);
+```
 
-Built with pnpm workspaces and Turborepo, with Biome, Vitest, tsup, Changesets, publint and
-@arethetypeswrong/cli.
+Documentation starts at [docs/INDEX.md](docs/INDEX.md). The package README is at
+[packages/explain/README.md](packages/explain/README.md).
+
+## Status
+
+- Version 0.1.0 is published to GitHub Packages as `@gabrielvfonseca/value-lineage`.
+- It has not yet been validated with real users. The bug corpus is written by the author. See
+  [docs/VALIDATION.md](docs/VALIDATION.md).
+
+## Repository layout
+
+| Path                 | What it is                                                     |
+| -------------------- | -------------------------------------------------------------- |
+| `packages/explain`   | The library (`@gabrielvfonseca/value-lineage`)                 |
+| `packages/corpus`    | 14 realistic pipeline bugs the library must diagnose (private) |
+| `packages/tsconfig`  | Shared TypeScript configuration (private)                      |
+| `apps/playground`    | Runnable examples (private)                                    |
+| `docs/`              | Documentation                                                  |
+| `skills/`            | Agent skills for using and extending the library               |
 
 ## Commands
 
 ```sh
 pnpm install
-pnpm build          # tsup: ESM, CJS and declarations
+pnpm lint           # biome check (Ultracite preset)
+pnpm fix            # biome fixes, via ultracite
 pnpm typecheck
-pnpm lint           # biome check
-pnpm test           # vitest with coverage thresholds
-pnpm check:package  # publint + attw
+pnpm build          # tsup: ESM, CJS, declarations
+pnpm test           # vitest with coverage thresholds, plus the corpus
+pnpm check:package  # publint and attw
 pnpm bench          # overhead benchmark
-pnpm --filter @explain/playground start
+pnpm check:all      # all of the above, in order
 pnpm changeset      # describe a user-visible change before merging
 ```
 
-CI runs lint, typecheck, build, test and package checks on Node 20, 22 and 24. Releases are
-versioned with Changesets and published with npm provenance.
+## Tooling
+
+- **Biome with Ultracite**: `biome.json` extends `ultracite/biome/core`. Tests have a small override
+  for rules that don't fit test code.
+- **Lefthook**: runs Biome on staged files and typechecks before each commit. Installed by the
+  `prepare` script.
+- **Turborepo**: runs build, typecheck and test across packages with caching.
+- **Changesets**: versioning and changelogs.
+- **Vitest**: unit, property and end-to-end tests.
+- **tsup**: builds ESM, CJS and declaration files.
+- **publint and attw**: check the package's exports and types.
+- **Dependabot**: weekly updates for npm and GitHub Actions.
+
+## Continuous integration
+
+CI runs lint, typecheck, build, test and package checks on Node 20, 22 and 24. The release
+workflow versions with Changesets. Publishing to GitHub Packages is described in
+[docs/RELEASING.md](docs/RELEASING.md).
+
+## License
+
+MIT. See [LICENSE.md](LICENSE.md).

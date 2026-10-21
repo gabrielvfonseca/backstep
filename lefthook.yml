@@ -1,0 +1,10 @@
+# Git hooks, installed by the "prepare" script. Run `pnpm exec lefthook install` to reinstall them.
+pre-commit:
+  parallel: true
+  commands:
+    biome:
+      glob: "*.{ts,tsx,mts,cts,js,jsx,mjs,cjs,json,jsonc,md,yml,yaml}"
+      run: pnpm exec biome check --no-errors-on-unmatched --files-ignore-unknown=true --write {staged_files}
+      stage_fixed: true
+    typecheck:
+      run: pnpm typecheck
