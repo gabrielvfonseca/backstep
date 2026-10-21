@@ -1,0 +1,18 @@
+{
+  "name": "@explain/corpus",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Realistic array-pipeline bugs used to validate that explain points at the real cause.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "clean": "rm -rf coverage"
+  },
+  "devDependencies": {
+    "@explain/tsconfig": "workspace:*",
+    "value-lineage": "workspace:*",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.12"
+  }
+}

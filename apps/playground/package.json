@@ -1,0 +1,15 @@
+{
+  "name": "@explain/playground",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Runnable examples that show explain on realistic bugs.",
+  "type": "module",
+  "scripts": {
+    "typecheck": "echo 'playground is plain JavaScript'",
+    "start": "EXPLAIN=1 node examples/order-total.mjs && EXPLAIN=1 node examples/sort-comparator.mjs",
+    "clean": "echo 'nothing to clean'"
+  },
+  "dependencies": {
+    "value-lineage": "workspace:*"
+  }
+}

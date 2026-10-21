@@ -1,0 +1,5 @@
+{
+  "extends": "@explain/tsconfig/library.json",
+  "compilerOptions": { "rootDir": ".", "noEmit": true },
+  "include": ["src", "test", "vitest.config.ts"]
+}
