@@ -155,7 +155,7 @@ function withStep<T>(
 function filterOp(st: ArrayState, args: unknown[]): unknown {
   const { raw, ids } = st;
   return withStep(st, "filter", callLabel("filter", args[0]), (rec) => {
-    const cb = toCallback(args[0], "filter");
+    const cb = toCallback(args[0], "filter", st.session.redactKeys);
     const thisArg = args[1];
     const kept: unknown[] = [];
     const keptIds: number[] = [];
@@ -169,7 +169,11 @@ function filterOp(st: ArrayState, args: unknown[]): unknown {
         kept.push(value);
         keptIds.push(originAt(ids, i));
       } else {
-        rec.drop(originAt(ids, i), value, () => `${fnName(cb)} → ${formatShort(verdict)}`);
+        rec.drop(
+          originAt(ids, i),
+          value,
+          () => `${fnName(cb)} → ${formatShort(verdict, st.session.redactKeys)}`,
+        );
       }
     }
     rec.commit(kept, kept.length);
@@ -180,7 +184,7 @@ function filterOp(st: ArrayState, args: unknown[]): unknown {
 function mapOp(st: ArrayState, args: unknown[]): unknown {
   const { raw, ids } = st;
   return withStep(st, "map", callLabel("map", args[0]), (rec) => {
-    const cb = toCallback(args[0], "map");
+    const cb = toCallback(args[0], "map", st.session.redactKeys);
     const thisArg = args[1];
     const out = new Array<unknown>(raw.length);
     for (let i = 0; i < raw.length; i++) {
@@ -198,7 +202,7 @@ function mapOp(st: ArrayState, args: unknown[]): unknown {
 function flatMapOp(st: ArrayState, args: unknown[]): unknown {
   const { raw, ids } = st;
   return withStep(st, "flatMap", callLabel("flatMap", args[0]), (rec) => {
-    const cb = toCallback(args[0], "flatMap");
+    const cb = toCallback(args[0], "flatMap", st.session.redactKeys);
     const thisArg = args[1];
     const out: unknown[] = [];
     const outIds: number[] = [];
@@ -230,10 +234,10 @@ function reduceOp(st: ArrayState, args: unknown[], right: boolean): unknown {
   const kind: OpKind = right ? "reduceRight" : "reduce";
   const hasInit = args.length >= 2;
   const init = args[1];
-  const label = `${kind}(${fnName(args[0])}${hasInit ? `, ${formatShort(init)}` : ""})`;
+  const label = `${kind}(${fnName(args[0])}${hasInit ? `, ${formatShort(init, st.session.redactKeys)}` : ""})`;
   const { raw } = st;
   return withStep(st, kind, label, (rec) => {
-    const cb = toCallback(args[0], kind);
+    const cb = toCallback(args[0], kind, st.session.redactKeys);
     let calls = 0;
     const step = (acc: unknown, value: unknown, index: number, array: unknown[]): unknown => {
       calls++;
@@ -263,7 +267,7 @@ type SearchKind = "find" | "findIndex" | "findLast" | "findLastIndex" | "some" |
 function searchOp(st: ArrayState, kind: SearchKind, args: unknown[]): unknown {
   const { raw, ids } = st;
   return withStep(st, kind, callLabel(kind, args[0]), (rec) => {
-    const cb = toCallback(args[0], kind);
+    const cb = toCallback(args[0], kind, st.session.redactKeys);
     const thisArg = args[1];
     const backward = kind === "findLast" || kind === "findLastIndex";
     // `find` visits holes as undefined; `some` and `every` skip them, as the native methods do.
@@ -307,7 +311,8 @@ function sortOp(st: ArrayState, args: unknown[], self: unknown[], copy: boolean)
   const { raw, ids } = st;
   const label = args[0] === undefined ? `${kind}()` : callLabel(kind, args[0]);
   return withStep(st, kind, label, (rec) => {
-    const comparator = args[0] === undefined ? undefined : toCallback(args[0], kind);
+    const comparator =
+      args[0] === undefined ? undefined : toCallback(args[0], kind, st.session.redactKeys);
     const compare = (i: number, j: number): number => {
       const a = raw[i];
       const b = raw[j];
@@ -368,7 +373,7 @@ function sortOp(st: ArrayState, args: unknown[], self: unknown[], copy: boolean)
 
 function sliceOp(st: ArrayState, args: unknown[]): unknown {
   const { raw, ids } = st;
-  const label = `slice(${args.map((arg) => formatShort(arg)).join(", ")})`;
+  const label = `slice(${args.map((arg) => formatShort(arg, st.session.redactKeys)).join(", ")})`;
   return withStep(st, "slice", label, (rec) => {
     const n = raw.length;
     const start = relativeIndex(args[0], n, 0);
@@ -408,9 +413,11 @@ function originAt(ids: readonly number[], index: number): number {
   return ids[index] ?? -1;
 }
 
-function toCallback(value: unknown, op: string): Callback {
+function toCallback(value: unknown, op: string, redactKeys: RegExp): Callback {
   if (typeof value !== "function") {
-    throw new TypeError(`${op}: callback must be a function, received ${formatShort(value)}`);
+    throw new TypeError(
+      `${op}: callback must be a function, received ${formatShort(value, redactKeys)}`,
+    );
   }
   return value as Callback;
 }

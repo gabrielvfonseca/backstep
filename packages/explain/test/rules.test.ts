@@ -1,5 +1,6 @@
 // biome-ignore-all lint/suspicious/noSparseArray: sparse arrays are the inputs under test
 import { beforeEach, describe, expect, it } from "vitest";
+import { configure } from "../src/index.js";
 import { resetForTest, run } from "./helpers.js";
 
 const codes = (report: { findings: readonly { code: string }[] }) =>
@@ -201,5 +202,20 @@ describe("branch coverage of unusual inputs", () => {
     const { report, value } = run([1, 2, 3], (xs) => xs.toReversed().filter((x) => x !== 2));
     expect(value).toEqual([3, 1]);
     expect(report.steps[0]?.dropped[0]?.origin).toBe(1);
+  });
+});
+
+describe("custom redaction applies to labels and drop reasons", () => {
+  beforeEach(() => {
+    resetForTest();
+    configure({ redactKeys: /tenantId/ });
+  });
+
+  it("redacts a configured key inside a reduce label built from the initial value", () => {
+    const { report } = run([1], (xs) =>
+      xs.reduce((acc) => acc, { tenantId: "acme-secret" } as object),
+    );
+    expect(report.steps[0]?.label).toContain('tenantId: "[redacted]"');
+    expect(report.steps[0]?.label).not.toContain("acme-secret");
   });
 });

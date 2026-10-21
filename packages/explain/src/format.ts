@@ -9,12 +9,11 @@ export interface FormatOptions {
 export const DEFAULT_REDACT_KEYS =
   /pass(word)?|secret|token|api[-_]?key|authorization|cookie|private[-_]?key|credit[-_]?card|card[-_]?number|ssn/i;
 
-const SHORT: FormatOptions = {
+const SHORT_LIMITS = {
   maxDepth: 1,
   maxItems: 3,
   maxStringLength: 40,
-  redactKeys: DEFAULT_REDACT_KEYS,
-};
+} as const;
 
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
 
@@ -23,9 +22,12 @@ export function formatValue(value: unknown, options: FormatOptions): string {
   return render(value, options, 0, new Set());
 }
 
-/** Compact rendering used inside step labels and findings. */
-export function formatShort(value: unknown): string {
-  return render(value, SHORT, 0, new Set());
+/**
+ * Compact rendering used inside step labels, drop reasons and findings. The caller passes the
+ * configured redaction pattern, so these strings honour `redactKeys` like the full report does.
+ */
+export function formatShort(value: unknown, redactKeys: RegExp): string {
+  return render(value, { ...SHORT_LIMITS, redactKeys }, 0, new Set());
 }
 
 function render(value: unknown, o: FormatOptions, depth: number, seen: Set<object>): string {

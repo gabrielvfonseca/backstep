@@ -113,7 +113,7 @@ function execute<I>(
   options: TraceOptions<unknown>,
   config: ExplainConfig,
 ): Outcome {
-  const session = new Session(name, config.maxSamples);
+  const session = new Session(name, config.maxSamples, config.redactKeys);
   const reportInput = describeInput(input, config.maxSamples);
   const traced = Array.isArray(input)
     ? wrapArray(session, input as unknown[], indexes(input.length))
@@ -143,7 +143,7 @@ async function executeAsync<I>(
   options: TraceOptions<unknown>,
   config: ExplainConfig,
 ): Promise<Outcome> {
-  const session = new Session(name, config.maxSamples);
+  const session = new Session(name, config.maxSamples, config.redactKeys);
   const reportInput = describeInput(input, config.maxSamples);
   const traced = Array.isArray(input)
     ? wrapArray(session, input as unknown[], indexes(input.length))
@@ -188,6 +188,7 @@ function buildReport(
 ): TraceReport {
   const error: StepError | undefined = outcome.failed ? summarizeError(outcome.error) : undefined;
   const findings = analyze(session.steps, {
+    redactKeys: session.redactKeys,
     hasResult: !outcome.failed,
     result: outcome.result,
     error,

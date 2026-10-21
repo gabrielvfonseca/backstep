@@ -146,7 +146,7 @@ export class TraceReport {
     if (step.error) {
       main = `${paint("✖", COLOR.red)} threw ${step.error.name}`;
     } else if (step.result) {
-      main = `${step.inputCount} → ${formatShort(step.result.value)}`;
+      main = `${step.inputCount} → ${formatShort(step.result.value, fmt.redactKeys)}`;
     } else {
       main = `${step.inputCount} → ${step.outputCount}`;
     }

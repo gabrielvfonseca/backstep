@@ -80,9 +80,9 @@ describe("formatValue", () => {
 
 describe("formatShort", () => {
   it("is compact for step labels and findings", () => {
-    expect(formatShort({ id: "a1", stock: 0, nested: { deep: true } })).toBe(
+    expect(formatShort({ id: "a1", stock: 0, nested: { deep: true } }, DEFAULT_REDACT_KEYS)).toBe(
       '{id: "a1", stock: 0, nested: {…}}',
     );
-    expect(formatShort([1, 2, 3, 4, 5])).toBe("[1, 2, 3, …+2]");
+    expect(formatShort([1, 2, 3, 4, 5], DEFAULT_REDACT_KEYS)).toBe("[1, 2, 3, …+2]");
   });
 });

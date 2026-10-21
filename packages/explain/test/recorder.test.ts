@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { DEFAULT_REDACT_KEYS } from "../src/format.js";
 import { isPlainObject, Session, StepRecorder, snapshot } from "../src/recorder.js";
 
 describe("StepRecorder", () => {
   it("ignores a second commit or fail", () => {
-    const session = new Session("t", 2);
+    const session = new Session("t", 2, DEFAULT_REDACT_KEYS);
     const rec = new StepRecorder(session, "map", "map(x)", [1]);
     rec.commit([1], 1);
     rec.commit([2, 3], 2);
@@ -13,7 +14,7 @@ describe("StepRecorder", () => {
   });
 
   it("ignores a fail after a commit and a commit after a fail", () => {
-    const session = new Session("t", 2);
+    const session = new Session("t", 2, DEFAULT_REDACT_KEYS);
     const failed = new StepRecorder(session, "map", "a", [1]);
     failed.fail(new Error("x"));
     failed.commit([], 0);
@@ -22,7 +23,7 @@ describe("StepRecorder", () => {
   });
 
   it("samples at most maxSamples drops but counts them all", () => {
-    const session = new Session("t", 1);
+    const session = new Session("t", 1, DEFAULT_REDACT_KEYS);
     const rec = new StepRecorder(session, "filter", "f", [1, 2, 3]);
     rec.drop(0, 1, "r1");
     rec.drop(1, 2, () => "r2");

@@ -37,6 +37,7 @@ export class Session {
   constructor(
     readonly name: string,
     readonly maxSamples: number,
+    readonly redactKeys: RegExp,
   ) {}
 }
 

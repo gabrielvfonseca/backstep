@@ -2,6 +2,7 @@ import { formatShort } from "./format.js";
 import type { Drop, Finding, FindingCode, Severity, Step, StepError } from "./types.js";
 
 export interface EndState {
+  readonly redactKeys: RegExp;
   readonly hasResult: boolean;
   readonly result: unknown;
   readonly error: StepError | undefined;
@@ -30,7 +31,7 @@ export function analyze(steps: readonly Step[], end: EndState): Finding[] {
   };
 
   for (const step of steps) {
-    inspect(step, add);
+    inspect(step, add, end.redactKeys);
   }
   if (end.error && !steps.some((step) => step.error)) {
     add("error", undefined, "threw", `threw ${end.error.name}: ${end.error.message}`);
@@ -40,7 +41,7 @@ export function analyze(steps: readonly Step[], end: EndState): Finding[] {
       "error",
       steps.at(-1)?.index,
       "expectation-failed",
-      `${end.expectMessage ?? "expect() predicate"} failed; result was ${formatShort(end.result)}`,
+      `${end.expectMessage ?? "expect() predicate"} failed; result was ${formatShort(end.result, end.redactKeys)}`,
     );
   }
   return findings;
@@ -60,7 +61,7 @@ export function firstDivergence(findings: readonly Finding[]): number | undefine
   return best;
 }
 
-function inspect(step: Step, add: Adder): void {
+function inspect(step: Step, add: Adder, redactKeys: RegExp): void {
   const at = step.index;
   if (step.error) {
     add("error", at, "threw", `${step.label} threw ${step.error.name}: ${step.error.message}`);
@@ -95,7 +96,7 @@ function inspect(step: Step, add: Adder): void {
   if (f.nonFiniteIntroduced > 0) {
     const message =
       step.kind === "reduce" || step.kind === "reduceRight"
-        ? `reduce produced ${formatShort(produced)} from finite inputs`
+        ? `reduce produced ${formatShort(produced, redactKeys)} from finite inputs`
         : `${f.nonFiniteIntroduced} of ${step.inputCount} result(s) are undefined, null or NaN`;
     add("error", at, "non-finite", message);
   }
@@ -112,7 +113,7 @@ function inspect(step: Step, add: Adder): void {
       "warning",
       at,
       "returned-initial",
-      `had no elements to combine and returned its initial value ${formatShort(produced)}`,
+      `had no elements to combine and returned its initial value ${formatShort(produced, redactKeys)}`,
     );
   }
   if (f.nonNumericComparator) {
@@ -128,7 +129,7 @@ function inspect(step: Step, add: Adder): void {
       "warning",
       at,
       "numeric-string-concat",
-      `combined numeric-looking strings into the string ${formatShort(produced)}; convert with Number() before reducing`,
+      `combined numeric-looking strings into the string ${formatShort(produced, redactKeys)}; convert with Number() before reducing`,
     );
   }
   if (step.kind === "every" && step.inputCount === 0 && produced === true) {
@@ -148,7 +149,12 @@ function inspect(step: Step, add: Adder): void {
     );
   }
   if (FIND_FAMILY.has(step.kind) && f.noMatch) {
-    add("info", at, "no-match", `no element matched; the result is ${formatShort(produced)}`);
+    add(
+      "info",
+      at,
+      "no-match",
+      `no element matched; the result is ${formatShort(produced, redactKeys)}`,
+    );
   }
 }
 
