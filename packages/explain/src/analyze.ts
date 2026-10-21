@@ -2,12 +2,12 @@ import { formatShort } from "./format.js";
 import type { Drop, Finding, FindingCode, Severity, Step, StepError } from "./types.js";
 
 export interface EndState {
-  readonly redactKeys: RegExp;
-  readonly hasResult: boolean;
-  readonly result: unknown;
   readonly error: StepError | undefined;
   readonly expect?: ((result: unknown) => boolean) | undefined;
   readonly expectMessage?: string | undefined;
+  readonly hasResult: boolean;
+  readonly redactKeys: RegExp;
+  readonly result: unknown;
 }
 
 type Adder = (
@@ -27,7 +27,7 @@ const DROP_MAJORITY = 0.9;
 export function analyze(steps: readonly Step[], end: EndState): Finding[] {
   const findings: Finding[] = [];
   const add: Adder = (severity, step, code, message) => {
-    findings.push({ severity, step, code, message });
+    findings.push({ code, message, severity, step });
   };
 
   for (const step of steps) {

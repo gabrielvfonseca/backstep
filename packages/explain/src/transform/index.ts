@@ -1,5 +1,8 @@
 import { parse } from "@babel/parser";
 
+const TSX_FILE = /\.tsx$/;
+const TS_FILE = /\.ts$|\.mts$|\.cts$/;
+
 /**
  * Source transform for inline chains. Rewrites
  *
@@ -14,8 +17,8 @@ import { parse } from "@babel/parser";
  */
 
 export interface TransformResult {
-  readonly code: string;
   readonly changed: boolean;
+  readonly code: string;
 }
 
 /** Array methods that make a chain worth rewriting. Other calls are left alone. */
@@ -40,26 +43,26 @@ const PACKAGE = "@gabrielvfonseca/value-lineage";
 const PARAM = "__explain_input";
 
 interface Node {
-  readonly type: string;
-  readonly start: number;
   readonly end: number;
+  readonly start: number;
+  readonly type: string;
   readonly [key: string]: unknown;
 }
 
 interface Edit {
-  readonly start: number;
   readonly end: number;
+  readonly start: number;
   readonly text: string;
 }
 
 export function transformSource(code: string, filename = "module.ts"): TransformResult {
   if (!code.includes(PACKAGE)) {
-    return { code, changed: false };
+    return { changed: false, code };
   }
 
   const ast = parse(code, {
-    sourceType: "module",
     plugins: pluginsFor(filename),
+    sourceType: "module",
   });
   const program = ast.program as unknown as Node;
   const traceNames = new Set<string>();
@@ -82,7 +85,7 @@ export function transformSource(code: string, filename = "module.ts"): Transform
     }
   }
   if (traceNames.size === 0 && namespaceNames.size === 0) {
-    return { code, changed: false };
+    return { changed: false, code };
   }
 
   const edits: Edit[] = [];
@@ -100,19 +103,19 @@ export function transformSource(code: string, filename = "module.ts"): Transform
   });
 
   if (edits.length === 0) {
-    return { code, changed: false };
+    return { changed: false, code };
   }
   let output = code;
   for (const edit of [...edits].sort((a, b) => b.start - a.start)) {
     output = output.slice(0, edit.start) + edit.text + output.slice(edit.end);
   }
-  return { code: output, changed: true };
+  return { changed: true, code: output };
 }
 
 function rewrite(call: Node, code: string, collision: boolean): Edit | undefined {
   const args = list(call, "arguments");
   const [nameArg, callbackArg, optionsArg] = args;
-  if (!nameArg || !callbackArg || callbackArg.type !== "ArrowFunctionExpression") {
+  if (!(nameArg && callbackArg) || callbackArg.type !== "ArrowFunctionExpression") {
     return undefined;
   }
   if (list(callbackArg, "params").length !== 0 || callbackArg.async === true) {
@@ -137,8 +140,8 @@ function rewrite(call: Node, code: string, collision: boolean): Edit | undefined
   const rootText = code.slice(chain.root.start, chain.root.end);
   const optionsText = optionsArg ? `, ${code.slice(optionsArg.start, optionsArg.end)}` : "";
   return {
-    start: call.start,
     end: call.end,
+    start: call.start,
     text: `${calleeText}(${nameText}, ${rootText}, (${PARAM}) => ${bodyText}${optionsText})`,
   };
 }
@@ -150,7 +153,7 @@ function arrowExpression(arrow: Node): Node | undefined {
     return bodyNode;
   }
   const statements = list(bodyNode, "body");
-  const only = statements[0];
+  const [only] = statements;
   if (statements.length === 1 && only && only.type === "ReturnStatement") {
     return (only.argument as Node | null) ?? undefined;
   }
@@ -171,7 +174,7 @@ function findChainRoot(expr: Node): { root: Node } | undefined {
     root = callee.object as Node;
     node = root;
   }
-  if (!root || !innermost || !ARRAY_METHODS.has(innermost)) {
+  if (!(root && innermost && ARRAY_METHODS.has(innermost))) {
     return undefined;
   }
   return { root };
@@ -204,10 +207,10 @@ function isTraceCall(call: Node, names: Set<string>, namespaces: Set<string>): b
 }
 
 function pluginsFor(filename: string): ("typescript" | "jsx")[] {
-  if (/\.tsx$/.test(filename)) {
+  if (TSX_FILE.test(filename)) {
     return ["typescript", "jsx"];
   }
-  if (/\.ts$|\.mts$|\.cts$/.test(filename)) {
+  if (TS_FILE.test(filename)) {
     return ["typescript"];
   }
   return ["jsx"];

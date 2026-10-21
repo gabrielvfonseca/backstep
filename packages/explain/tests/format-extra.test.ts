@@ -13,14 +13,14 @@ describe("format edge cases", () => {
         },
       }),
     ).toEqual({
-      name: "Error",
       message: "[unprintable value]",
+      name: "Error",
     });
   });
 
   it("summarises an Error and a plain thrown value", () => {
-    expect(summarizeError(new TypeError("bad"))).toEqual({ name: "TypeError", message: "bad" });
-    expect(summarizeError("text")).toEqual({ name: "Error", message: "text" });
+    expect(summarizeError(new TypeError("bad"))).toEqual({ message: "bad", name: "TypeError" });
+    expect(summarizeError("text")).toEqual({ message: "text", name: "Error" });
   });
 
   it("renders class instances using the inferred class name", () => {
@@ -29,8 +29,8 @@ describe("format edge cases", () => {
   });
 
   it("renders an object with a non-function constructor as plain", () => {
-    expect(formatValue(Object.assign(Object.create(null), { constructor: 1, a: 2 }), opts)).toBe(
-      "{constructor: 1, a: 2}",
+    expect(formatValue(Object.assign(Object.create(null), { a: 2, constructor: 1 }), opts)).toBe(
+      "{a: 2, constructor: 1}",
     );
   });
 
@@ -39,6 +39,6 @@ describe("format edge cases", () => {
   });
 
   it("renders objects with unusual keys", () => {
-    expect(formatValue({ "a b": 1, $ok: 2 }, opts)).toBe('{"a b": 1, $ok: 2}');
+    expect(formatValue({ $ok: 2, "a b": 1 }, opts)).toBe('{$ok: 2, "a b": 1}');
   });
 });

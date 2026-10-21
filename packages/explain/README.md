@@ -23,7 +23,7 @@ When `total` is `0` and every item was filtered out, the console shows:
 order.total = 0   ⚠ diverged at step 1
  ├ input                   3 items
  ├ filter(isAvailable)     3 → 0   ✖
- │    e.g. #0 {sku: "KB-01", name: "Keyboard", price: 79, stock: 0}  #1 {…}  #2 {…}
+ │    e.g. #0 {name: "Keyboard", price: 79, sku: "KB-01", stock: 0}  #1 {…}  #2 {…}
  │    ✖ removed all 3 element(s) (isAvailable → false)
  ├ map(getPrice)           0 → 0
  └ reduce(<anonymous>, 0)  0 → 0   ⚠

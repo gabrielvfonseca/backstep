@@ -12,12 +12,14 @@
     "pipeline",
     "data-flow"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielvfonseca/explain.git",
+    "directory": "packages/explain"
+  },
   "license": "MIT",
-  "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
       "import": {
@@ -51,41 +53,37 @@
       }
     }
   },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist",
     "README.md",
     "LICENSE",
     "CHANGELOG.md"
   ],
-  "engines": {
-    "node": ">=20"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
-  },
   "scripts": {
+    "bench": "vitest bench --run",
     "build": "tsup",
+    "check:package": "publint --strict && attw --pack . --profile esm-only --ignore-rules cjs-resolves-to-esm",
+    "clean": "rm -rf dist coverage",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "bench": "vitest bench --run",
-    "check:package": "publint --strict && attw --pack . --profile esm-only --ignore-rules cjs-resolves-to-esm",
-    "clean": "rm -rf dist coverage"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@explain/tsconfig": "workspace:*",
     "@arethetypeswrong/cli": "^0.18.5",
+    "@babel/parser": "^8.0.7",
+    "@explain/tsconfig": "workspace:*",
+    "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^4.1.12",
+    "esbuild": "^0.28.2",
     "fast-check": "^4.10.2",
     "publint": "^0.3.25",
     "tsup": "^9.0.0",
     "typescript": "~5.9.3",
-    "vitest": "^4.1.12",
-    "@babel/parser": "^8.0.7",
-    "esbuild": "^0.28.2",
-    "@types/node": "^24.0.0"
+    "vitest": "^4.1.12"
   },
   "peerDependencies": {
     "@babel/parser": ">=7.20.0",
@@ -99,9 +97,11 @@
       "optional": true
     }
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gabrielvfonseca/explain.git",
-    "directory": "packages/explain"
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
   }
 }

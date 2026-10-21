@@ -17,7 +17,7 @@ describe("formatValue", () => {
   it("renders primitives unambiguously", () => {
     expect(formatValue("hi", options)).toBe('"hi"');
     expect(formatValue(-0, options)).toBe("-0");
-    expect(formatValue(NaN, options)).toBe("NaN");
+    expect(formatValue(Number.NaN, options)).toBe("NaN");
     expect(formatValue(10n, options)).toBe("10n");
     expect(formatValue(undefined, options)).toBe("undefined");
     expect(formatValue(null, options)).toBe("null");
@@ -58,9 +58,17 @@ describe("formatValue", () => {
   });
 
   it("redacts sensitive keys", () => {
-    expect(formatValue({ password: "x", apiKey: "y", name: "z" }, options)).toBe(
-      '{password: "[redacted]", apiKey: "[redacted]", name: "z"}',
+    expect(formatValue({ apiKey: "y", name: "z", password: "x" }, options)).toBe(
+      '{apiKey: "[redacted]", name: "z", password: "[redacted]"}',
     );
+  });
+
+  it("renders keys in insertion order", () => {
+    const entries = Object.fromEntries([
+      ["zeta", 1],
+      ["alpha", 2],
+    ]);
+    expect(formatValue(entries, options)).toBe("{zeta: 1, alpha: 2}");
   });
 
   it("shows throwing getters as unreadable and keeps going", () => {
@@ -80,8 +88,8 @@ describe("formatValue", () => {
 
 describe("formatShort", () => {
   it("is compact for step labels and findings", () => {
-    expect(formatShort({ id: "a1", stock: 0, nested: { deep: true } }, DEFAULT_REDACT_KEYS)).toBe(
-      '{id: "a1", stock: 0, nested: {…}}',
+    expect(formatShort({ id: "a1", nested: { deep: true }, stock: 0 }, DEFAULT_REDACT_KEYS)).toBe(
+      '{id: "a1", nested: {…}, stock: 0}',
     );
     expect(formatShort([1, 2, 3, 4, 5], DEFAULT_REDACT_KEYS)).toBe("[1, 2, 3, …+2]");
   });

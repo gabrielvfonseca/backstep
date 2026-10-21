@@ -2,19 +2,22 @@ import { ExplainError } from "./errors.js";
 import { DEFAULT_REDACT_KEYS, type FormatOptions } from "./format.js";
 import type { TraceReport } from "./report.js";
 
+const TRUTHY_FLAG = /^(1|true|yes|on)$/i;
+const FALSY_FLAG = /^(0|false|no|off)$/i;
+
 export interface ExplainConfig {
-  /** When false, `trace` runs the callback directly and records nothing. */
-  readonly enabled: boolean;
   /** Emit a report for every trace, not only when a divergence is found. */
   readonly always: boolean;
-  /** Maximum number of sample elements kept per step. */
-  readonly maxSamples: number;
+  /** When false, `trace` runs the callback directly and records nothing. */
+  readonly enabled: boolean;
   readonly maxDepth: number;
   readonly maxItems: number;
+  /** Maximum number of sample elements kept per step. */
+  readonly maxSamples: number;
   readonly maxStringLength: number;
-  readonly redactKeys: RegExp;
   /** Receives each report that needs attention. `null` disables output. */
   readonly onReport: ((report: TraceReport) => void) | null;
+  readonly redactKeys: RegExp;
 }
 
 export type ConfigOptions = Partial<ExplainConfig>;
@@ -64,14 +67,14 @@ export function toFormatOptions(config: ExplainConfig): FormatOptions {
 
 function defaults(): ExplainConfig {
   return {
-    enabled: resolveEnabled(),
     always: false,
-    maxSamples: 5,
+    enabled: resolveEnabled(),
     maxDepth: 3,
     maxItems: 6,
+    maxSamples: 5,
     maxStringLength: 80,
-    redactKeys: DEFAULT_REDACT_KEYS,
     onReport: defaultSink,
+    redactKeys: DEFAULT_REDACT_KEYS,
   };
 }
 
@@ -86,10 +89,10 @@ function resolveEnabled(): boolean {
   }
   const flag = env.EXPLAIN;
   if (flag !== undefined) {
-    if (/^(1|true|yes|on)$/i.test(flag)) {
+    if (TRUTHY_FLAG.test(flag)) {
       return true;
     }
-    if (/^(0|false|no|off)$/i.test(flag)) {
+    if (FALSY_FLAG.test(flag)) {
       return false;
     }
   }

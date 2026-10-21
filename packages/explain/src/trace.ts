@@ -10,24 +10,25 @@ import type { StepError } from "./types.js";
 export const EXPLAIN_REPORT = Symbol.for("explain.report");
 
 export interface TraceOptions<R = unknown> {
+  /** Emit the report even when nothing diverged. */
+  always?: boolean;
   /** Predicate the result must satisfy. A failing predicate is reported as an error. */
+  // biome-ignore lint/style/useConsistentMethodSignatures: method syntax is bivariant, so TraceOptions<R> is assignable to TraceOptions<unknown>
   expect?(result: R): boolean;
   /** Describes the expectation in the report, for example "total is positive". */
   expectMessage?: string;
-  /** Emit the report even when nothing diverged. */
-  always?: boolean;
 }
 
 export interface TracedResult<R> {
-  readonly value: R;
   readonly report: TraceReport;
+  readonly value: R;
 }
 
 interface Outcome {
+  readonly error: unknown;
+  readonly failed: boolean;
   readonly report: TraceReport;
   readonly value: unknown;
-  readonly failed: boolean;
-  readonly error: unknown;
 }
 
 /**
@@ -94,7 +95,7 @@ export function traceReport<I, R>(
     attachReport(outcome.error, outcome.report);
     throw outcome.error;
   }
-  return { value: outcome.value as R, report: outcome.report };
+  return { report: outcome.report, value: outcome.value as R };
 }
 
 /** Returns the report attached to an error thrown from a traced run, if any. */
@@ -133,7 +134,7 @@ function execute<I>(
     failed = true;
     error = caught;
   }
-  return finish(session, reportInput, { failed, error, value }, options, config);
+  return finish(session, reportInput, { error, failed, value }, options, config);
 }
 
 async function executeAsync<I>(
@@ -158,7 +159,7 @@ async function executeAsync<I>(
     failed = true;
     error = caught;
   }
-  return finish(session, reportInput, { failed, error, value }, options, config);
+  return finish(session, reportInput, { error, failed, value }, options, config);
 }
 
 function finish(
@@ -172,11 +173,11 @@ function finish(
   const report = buildReport(
     session,
     input,
-    { failed: raw.failed, error: raw.error, result },
+    { error: raw.error, failed: raw.failed, result },
     options,
     config,
   );
-  return { report, value: result, failed: raw.failed, error: raw.error };
+  return { error: raw.error, failed: raw.failed, report, value: result };
 }
 
 function buildReport(
@@ -188,22 +189,22 @@ function buildReport(
 ): TraceReport {
   const error: StepError | undefined = outcome.failed ? summarizeError(outcome.error) : undefined;
   const findings = analyze(session.steps, {
-    redactKeys: session.redactKeys,
-    hasResult: !outcome.failed,
-    result: outcome.result,
     error,
     expect: options.expect,
     expectMessage: options.expectMessage,
+    hasResult: !outcome.failed,
+    redactKeys: session.redactKeys,
+    result: outcome.result,
   });
   const data: ReportData = {
-    name: session.name,
-    durationMs: now() - session.startedAt,
-    input,
-    steps: session.steps,
-    findings,
     divergedAt: firstDivergence(findings),
-    result: outcome.result,
+    durationMs: now() - session.startedAt,
     error,
+    findings,
+    input,
+    name: session.name,
+    result: outcome.result,
+    steps: session.steps,
   };
   return new TraceReport(data, toFormatOptions(config));
 }
@@ -224,7 +225,7 @@ function emit(
   always: boolean,
   sink: ((report: TraceReport) => void) | null,
 ): void {
-  if (!sink || (!always && !report.hasProblem)) {
+  if (!(sink && (always || report.hasProblem))) {
     return;
   }
   try {
@@ -241,9 +242,9 @@ function attachReport(error: unknown, report: TraceReport): void {
   }
   try {
     Object.defineProperty(error, EXPLAIN_REPORT, {
-      value: report,
-      enumerable: false,
       configurable: true,
+      enumerable: false,
+      value: report,
     });
   } catch {
     // Frozen or sealed errors cannot carry the report. The report is still emitted.

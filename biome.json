@@ -1,5 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.6.2/schema.json",
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/biome/core"],
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -7,7 +8,6 @@
   },
   "files": {
     "includes": [
-      "**",
       "!**/dist",
       "!**/coverage",
       "!**/node_modules",
@@ -43,5 +43,28 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["**/tests/**"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "useTopLevelRegex": "off",
+            "noNamespaceImport": "off"
+          },
+          "suspicious": {
+            "noEmptyBlockStatements": "off",
+            "useIterableCallbackReturn": "off"
+          },
+          "complexity": {
+            "noVoid": "off"
+          },
+          "style": {
+            "useThrowOnlyError": "off"
+          }
+        }
+      }
+    }
+  ]
 }

@@ -1,7 +1,7 @@
 import { bench, describe } from "vitest";
 import { configure, resetConfig, trace } from "../src/index.js";
 
-const data = Array.from({ length: 100_000 }, (_, i) => ({ id: i, stock: i % 3, price: i % 97 }));
+const data = Array.from({ length: 100_000 }, (_, i) => ({ id: i, price: i % 97, stock: i % 3 }));
 
 const pipeline = (items: typeof data) =>
   items

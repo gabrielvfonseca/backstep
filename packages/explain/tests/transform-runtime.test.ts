@@ -15,8 +15,8 @@ describe("transformed code behaves like the hand-written explicit form", () => {
       "a.ts",
     ).code;
     const explicit = [
-      { p: 2, ok: true },
-      { p: 5, ok: false },
+      { ok: true, p: 2 },
+      { ok: false, p: 5 },
     ]
       .filter((i) => i.ok)
       .map((i) => i.p)

@@ -8,14 +8,14 @@ export interface ReportInput {
 }
 
 export interface ReportData {
-  readonly name: string;
-  readonly durationMs: number;
-  readonly input: ReportInput;
-  readonly steps: readonly Step[];
-  readonly findings: readonly Finding[];
   readonly divergedAt: number | undefined;
-  readonly result: unknown;
+  readonly durationMs: number;
   readonly error: StepError | undefined;
+  readonly findings: readonly Finding[];
+  readonly input: ReportInput;
+  readonly name: string;
+  readonly result: unknown;
+  readonly steps: readonly Step[];
 }
 
 export interface RenderOptions {
@@ -30,7 +30,7 @@ interface Row {
   readonly subs: readonly string[];
 }
 
-const COLOR = { bold: 1, red: 31, yellow: 33, green: 32 } as const;
+const COLOR = { bold: 1, green: 32, red: 31, yellow: 33 } as const;
 const MAX_SHOWN_DROPS = 3;
 
 /** The outcome of one traced run. Immutable once built. */
@@ -105,35 +105,35 @@ export class TraceReport {
     const fmt = this.#format;
     const show = (value: unknown): string => formatValue(value, fmt);
     return {
-      name: this.name,
-      durationMs: this.durationMs,
       divergedAt: this.divergedAt ?? null,
-      result: this.error ? null : show(this.result),
+      durationMs: this.durationMs,
       error: this.error ?? null,
+      findings: this.findings.map((finding) => ({ ...finding })),
       input: {
         count: this.input.count ?? null,
         sample: this.input.sample.map(show),
         value: this.input.count === undefined ? show(this.input.value) : null,
       },
-      findings: this.findings.map((finding) => ({ ...finding })),
+      name: this.name,
+      result: this.error ? null : show(this.result),
       steps: this.steps.map((step) => ({
-        index: step.index,
-        kind: step.kind,
-        label: step.label,
-        inputCount: step.inputCount,
-        outputCount: step.outputCount,
-        inputSample: step.inputSample.map(show),
-        outputSample: step.outputSample.map(show),
         dropped: step.dropped.map((drop) => ({
           origin: drop.origin,
-          value: show(drop.value),
           reason: drop.reason,
+          value: show(drop.value),
         })),
         droppedCount: step.droppedCount,
-        result: step.result ? show(step.result.value) : null,
+        durationMs: step.durationMs,
         error: step.error ?? null,
         facts: { ...step.facts },
-        durationMs: step.durationMs,
+        index: step.index,
+        inputCount: step.inputCount,
+        inputSample: step.inputSample.map(show),
+        kind: step.kind,
+        label: step.label,
+        outputCount: step.outputCount,
+        outputSample: step.outputSample.map(show),
+        result: step.result ? show(step.result.value) : null,
       })),
     };
   }
@@ -159,11 +159,7 @@ export class TraceReport {
       subs.push(`${icon(finding.severity, paint)} ${finding.message}`);
     }
 
-    const worst = stepFindings.some((finding) => finding.severity === "error")
-      ? paint("✖", COLOR.red)
-      : stepFindings.some((finding) => finding.severity === "warning")
-        ? paint("⚠", COLOR.yellow)
-        : "";
+    const worst = worstMarker(stepFindings, paint);
 
     return { label: step.label, main, marker: worst, subs };
   }
@@ -193,4 +189,17 @@ function icon(severity: Severity, paint: (text: string, code: number) => string)
     return paint("⚠", COLOR.yellow);
   }
   return "·";
+}
+
+function worstMarker(
+  findings: readonly Finding[],
+  paint: (text: string, code: number) => string,
+): string {
+  if (findings.some((finding) => finding.severity === "error")) {
+    return paint("✖", COLOR.red);
+  }
+  if (findings.some((finding) => finding.severity === "warning")) {
+    return paint("⚠", COLOR.yellow);
+  }
+  return "";
 }

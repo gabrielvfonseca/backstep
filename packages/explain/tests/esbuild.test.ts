@@ -5,7 +5,7 @@ import * as esbuild from "esbuild";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { valueLineage } from "../src/transform/esbuild.js";
 
-const libraryEntry = resolve(__dirname, "../src/index.ts");
+const libraryEntry = resolve(import.meta.dirname, "../src/index.ts");
 
 describe("valueLineage esbuild plugin", () => {
   let dir = "";
@@ -15,7 +15,7 @@ describe("valueLineage esbuild plugin", () => {
   });
 
   afterEach(async () => {
-    await rm(dir, { recursive: true, force: true });
+    await rm(dir, { force: true, recursive: true });
     vi.restoreAllMocks();
   });
 
@@ -34,14 +34,14 @@ describe("valueLineage esbuild plugin", () => {
     );
 
     const result = await esbuild.build({
-      entryPoints: [entry],
-      bundle: true,
-      write: false,
-      format: "cjs",
-      platform: "node",
       alias: { "@gabrielvfonseca/value-lineage": libraryEntry },
-      plugins: [valueLineage()],
+      bundle: true,
+      entryPoints: [entry],
+      format: "cjs",
       logLevel: "silent",
+      platform: "node",
+      plugins: [valueLineage()],
+      write: false,
     });
     const code = result.outputFiles[0]?.text ?? "";
     expect(code).toContain("__explain_input");
@@ -65,12 +65,12 @@ describe("valueLineage esbuild plugin", () => {
     const entry = join(dir, "plain.js");
     await writeFile(entry, "export const v = [1, 2].map((x) => x * 2);\n");
     const result = await esbuild.build({
-      entryPoints: [entry],
       bundle: true,
-      write: false,
+      entryPoints: [entry],
       format: "esm",
-      plugins: [valueLineage()],
       logLevel: "silent",
+      plugins: [valueLineage()],
+      write: false,
     });
     expect(result.outputFiles[0]?.text).toContain("x * 2");
     expect(result.outputFiles[0]?.text).not.toContain("__explain_input");

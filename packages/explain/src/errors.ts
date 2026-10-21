@@ -10,9 +10,9 @@ export class ExplainError extends Error {
 
 export function summarizeError(error: unknown): StepError {
   if (error instanceof Error) {
-    return { name: error.name, message: error.message };
+    return { message: error.message, name: error.name };
   }
-  return { name: "Error", message: safeString(error) };
+  return { message: safeString(error), name: "Error" };
 }
 
 function safeString(value: unknown): string {

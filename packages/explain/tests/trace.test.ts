@@ -69,7 +69,7 @@ describe("trace", () => {
 
   it("honours the global always setting", () => {
     const sink = vi.fn();
-    configure({ onReport: sink, always: true });
+    configure({ always: true, onReport: sink });
     trace("any", [1], (xs) => xs.map((x) => x));
     expect(sink).toHaveBeenCalledTimes(1);
   });

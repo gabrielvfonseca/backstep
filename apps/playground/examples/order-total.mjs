@@ -4,9 +4,9 @@ import { trace } from "@gabrielvfonseca/value-lineage";
 const order = {
   id: "ord_1042",
   items: [
-    { sku: "KB-01", name: "Keyboard", price: 79, stock: 0 },
-    { sku: "MS-02", name: "Mouse", price: 39, stock: 0 },
-    { sku: "MN-03", name: "Monitor", price: 299, stock: 0 },
+    { name: "Keyboard", price: 79, sku: "KB-01", stock: 0 },
+    { name: "Mouse", price: 39, sku: "MS-02", stock: 0 },
+    { name: "Monitor", price: 299, sku: "MN-03", stock: 0 },
   ],
 };
 

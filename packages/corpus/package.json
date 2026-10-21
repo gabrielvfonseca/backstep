@@ -5,9 +5,9 @@
   "description": "Realistic array-pipeline bugs used to validate that explain points at the real cause.",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf coverage",
     "test": "vitest run",
-    "clean": "rm -rf coverage"
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@explain/tsconfig": "workspace:*",

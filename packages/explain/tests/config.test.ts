@@ -3,7 +3,7 @@ import { configure, disable, ExplainError, enable, resetConfig, trace } from "..
 
 type Env = Record<string, string | undefined>;
 
-function withProcess(env: Env, isTTY = false, fn: () => void): void {
+function withProcess(env: Env, isTTY: boolean, fn: () => void): void {
   const original = (globalThis as { process?: unknown }).process;
   (globalThis as { process?: unknown }).process = { env, stdout: { isTTY } };
   try {
@@ -101,7 +101,7 @@ describe("configuration", () => {
   it("uses console.log for a healthy trace when always is set", () => {
     const log = vi.spyOn(console, "log").mockImplementation(() => undefined);
     resetConfig();
-    configure({ enabled: true, always: true });
+    configure({ always: true, enabled: true });
     trace("healthy", [1], (xs) => xs.map((x) => x));
     expect(log).toHaveBeenCalledTimes(1);
     expect(String(log.mock.calls[0]?.[0])).toContain("no divergence detected");

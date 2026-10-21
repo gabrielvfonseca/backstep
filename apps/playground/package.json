@@ -5,9 +5,9 @@
   "description": "Runnable examples that show explain on realistic bugs.",
   "type": "module",
   "scripts": {
-    "typecheck": "echo 'playground is plain JavaScript'",
+    "clean": "echo 'nothing to clean'",
     "start": "EXPLAIN=1 node examples/order-total.mjs && EXPLAIN=1 node examples/sort-comparator.mjs",
-    "clean": "echo 'nothing to clean'"
+    "typecheck": "echo 'playground is plain JavaScript'"
   },
   "dependencies": {
     "@gabrielvfonseca/value-lineage": "workspace:*"

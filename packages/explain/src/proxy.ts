@@ -2,6 +2,9 @@ import { formatShort } from "./format.js";
 import { isPlainObject, type Session, StepRecorder } from "./recorder.js";
 import type { OpKind } from "./types.js";
 
+const ARRAY_INDEX = /^(?:0|[1-9]\d*)$/;
+const NUMERIC_STRING = /^\s*[-+]?\d+(\.\d+)?\s*$/;
+
 /**
  * Every traced array is a Proxy over a raw array plus `ids`, a parallel array holding each
  * element's root index. Operations carry `ids` forward, so an element's origin survives
@@ -9,10 +12,10 @@ import type { OpKind } from "./types.js";
  * written directly into the array).
  */
 interface ArrayState {
-  readonly session: Session;
-  readonly raw: unknown[];
-  ids: number[];
   readonly bound: Map<string, (...args: unknown[]) => unknown>;
+  ids: number[];
+  readonly raw: unknown[];
+  readonly session: Session;
 }
 
 type Callback = (...args: unknown[]) => unknown;
@@ -48,8 +51,16 @@ export function unwrapResult(value: unknown): unknown {
 }
 
 export function wrapArray(session: Session, raw: unknown[], ids: number[]): unknown[] {
-  const state: ArrayState = { session, raw, ids, bound: new Map() };
+  const state: ArrayState = { bound: new Map(), ids, raw, session };
   const proxy: unknown[] = new Proxy(raw, {
+    deleteProperty(target, prop) {
+      const ok = Reflect.deleteProperty(target, prop);
+      const index = arrayIndex(prop);
+      if (ok && index !== undefined) {
+        state.ids[index] = -1;
+      }
+      return ok;
+    },
     get(target, prop, receiver) {
       if (typeof prop === "string") {
         const method = state.bound.get(prop) ?? bind(state, proxy, prop);
@@ -63,14 +74,6 @@ export function wrapArray(session: Session, raw: unknown[], ids: number[]): unkn
       const ok = Reflect.set(target, prop, unwrap(value));
       if (ok) {
         syncIds(state, arrayIndex(prop));
-      }
-      return ok;
-    },
-    deleteProperty(target, prop) {
-      const ok = Reflect.deleteProperty(target, prop);
-      const index = arrayIndex(prop);
-      if (ok && index !== undefined) {
-        state.ids[index] = -1;
       }
       return ok;
     },
@@ -106,7 +109,7 @@ function syncIds(state: ArrayState, index: number | undefined): void {
 }
 
 function arrayIndex(prop: string | symbol): number | undefined {
-  return typeof prop === "string" && /^(?:0|[1-9]\d*)$/.test(prop) ? Number(prop) : undefined;
+  return typeof prop === "string" && ARRAY_INDEX.test(prop) ? Number(prop) : undefined;
 }
 
 const OPS = new Map<string, Op>([
@@ -155,11 +158,11 @@ function withStep<T>(
 function filterOp(st: ArrayState, args: unknown[]): unknown {
   const { raw, ids } = st;
   return withStep(st, "filter", callLabel("filter", args[0]), (rec) => {
-    const cb = toCallback(args[0], "filter", st.session.redactKeys);
-    const thisArg = args[1];
+    const [callbackArg, thisArg] = args;
+    const cb = toCallback(callbackArg, "filter", st.session.redactKeys);
     const kept: unknown[] = [];
     const keptIds: number[] = [];
-    for (let i = 0; i < raw.length; i++) {
+    for (let i = 0; i < raw.length; i += 1) {
       if (!(i in raw)) {
         continue;
       }
@@ -184,10 +187,10 @@ function filterOp(st: ArrayState, args: unknown[]): unknown {
 function mapOp(st: ArrayState, args: unknown[]): unknown {
   const { raw, ids } = st;
   return withStep(st, "map", callLabel("map", args[0]), (rec) => {
-    const cb = toCallback(args[0], "map", st.session.redactKeys);
-    const thisArg = args[1];
+    const [callbackArg, thisArg] = args;
+    const cb = toCallback(callbackArg, "map", st.session.redactKeys);
     const out = new Array<unknown>(raw.length);
-    for (let i = 0; i < raw.length; i++) {
+    for (let i = 0; i < raw.length; i += 1) {
       if (i in raw) {
         out[i] = unwrap(cb.call(thisArg, raw[i], i, raw));
       }
@@ -202,11 +205,11 @@ function mapOp(st: ArrayState, args: unknown[]): unknown {
 function flatMapOp(st: ArrayState, args: unknown[]): unknown {
   const { raw, ids } = st;
   return withStep(st, "flatMap", callLabel("flatMap", args[0]), (rec) => {
-    const cb = toCallback(args[0], "flatMap", st.session.redactKeys);
-    const thisArg = args[1];
+    const [callbackArg, thisArg] = args;
+    const cb = toCallback(callbackArg, "flatMap", st.session.redactKeys);
     const out: unknown[] = [];
     const outIds: number[] = [];
-    for (let i = 0; i < raw.length; i++) {
+    for (let i = 0; i < raw.length; i += 1) {
       if (!(i in raw)) {
         continue;
       }
@@ -233,24 +236,23 @@ function flatMapOp(st: ArrayState, args: unknown[]): unknown {
 function reduceOp(st: ArrayState, args: unknown[], right: boolean): unknown {
   const kind: OpKind = right ? "reduceRight" : "reduce";
   const hasInit = args.length >= 2;
-  const init = args[1];
+  const [, init] = args;
   const label = `${kind}(${fnName(args[0])}${hasInit ? `, ${formatShort(init, st.session.redactKeys)}` : ""})`;
   const { raw } = st;
   return withStep(st, kind, label, (rec) => {
     const cb = toCallback(args[0], kind, st.session.redactKeys);
     let calls = 0;
     const step = (acc: unknown, value: unknown, index: number, array: unknown[]): unknown => {
-      calls++;
+      calls += 1;
       return cb(acc, value, index, array);
     };
     // Delegating to the native method keeps hole-skipping and the empty-array TypeError exact.
-    const result: unknown = right
-      ? hasInit
-        ? raw.reduceRight(step, init)
-        : raw.reduceRight(step)
-      : hasInit
-        ? raw.reduce(step, init)
-        : raw.reduce(step);
+    let result: unknown;
+    if (right) {
+      result = hasInit ? raw.reduceRight(step, init) : raw.reduceRight(step);
+    } else {
+      result = hasInit ? raw.reduce(step, init) : raw.reduce(step);
+    }
 
     const values = presentValues(raw);
     rec.facts.returnedInitial = calls === 0 && hasInit;
@@ -266,16 +268,17 @@ type SearchKind = "find" | "findIndex" | "findLast" | "findLastIndex" | "some" |
 
 function searchOp(st: ArrayState, kind: SearchKind, args: unknown[]): unknown {
   const { raw, ids } = st;
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: one scan loop covering find, findIndex, findLast, some and every, each with its own hole and direction rules
   return withStep(st, kind, callLabel(kind, args[0]), (rec) => {
-    const cb = toCallback(args[0], kind, st.session.redactKeys);
-    const thisArg = args[1];
+    const [callbackArg, thisArg] = args;
+    const cb = toCallback(callbackArg, kind, st.session.redactKeys);
     const backward = kind === "findLast" || kind === "findLastIndex";
     // `find` visits holes as undefined; `some` and `every` skip them, as the native methods do.
     const skipHoles = kind === "some" || kind === "every";
     const n = raw.length;
     // Index of the element that ended the scan: the match, or for `every` the first failure.
     let stopAt = -1;
-    for (let k = 0; k < n; k++) {
+    for (let k = 0; k < n; k += 1) {
       const i = backward ? n - 1 - k : k;
       if (skipHoles && !(i in raw)) {
         continue;
@@ -317,9 +320,7 @@ function sortOp(st: ArrayState, args: unknown[], self: unknown[], copy: boolean)
       const a = raw[i];
       const b = raw[j];
       if (comparator === undefined) {
-        const sa = String(a);
-        const sb = String(b);
-        return sa < sb ? -1 : sa > sb ? 1 : 0;
+        return compareText(String(a), String(b));
       }
       const verdict = comparator(a, b);
       if (typeof verdict === "boolean") {
@@ -334,7 +335,7 @@ function sortOp(st: ArrayState, args: unknown[], self: unknown[], copy: boolean)
     const defined: number[] = [];
     const undefs: number[] = [];
     const holes: number[] = [];
-    for (let i = 0; i < raw.length; i++) {
+    for (let i = 0; i < raw.length; i += 1) {
       if (!(i in raw)) {
         holes.push(i);
       } else if (raw[i] === undefined) {
@@ -358,7 +359,7 @@ function sortOp(st: ArrayState, args: unknown[], self: unknown[], copy: boolean)
     }
 
     const holeFlags = order.map((i) => !(i in raw));
-    for (let k = 0; k < order.length; k++) {
+    for (let k = 0; k < order.length; k += 1) {
       if (holeFlags[k]) {
         delete raw[k];
       } else {
@@ -380,7 +381,7 @@ function sliceOp(st: ArrayState, args: unknown[]): unknown {
     const end = relativeIndex(args[1], n, n);
     const out: unknown[] = [];
     const outIds: number[] = [];
-    for (let i = 0; i < n; i++) {
+    for (let i = 0; i < n; i += 1) {
       const origin = originAt(ids, i);
       if (i >= start && i < end) {
         out.push(raw[i]);
@@ -400,13 +401,28 @@ function concatOp(st: ArrayState, args: unknown[]): unknown {
   const outIds = st.ids.slice();
   for (const arg of args) {
     const argState = isTraced(arg) ? stateOf.get(arg) : undefined;
-    const values: unknown[] = argState ? argState.raw : Array.isArray(arg) ? arg : [arg];
-    for (let i = 0; i < values.length; i++) {
+    const values = valuesOf(arg, argState);
+    for (let i = 0; i < values.length; i += 1) {
       out.push(values[i]);
       outIds.push(argState ? originAt(argState.ids, i) : -1);
     }
   }
   return wrapArray(st.session, out, outIds);
+}
+
+function compareText(a: string, b: string): number {
+  if (a < b) {
+    return -1;
+  }
+  return a > b ? 1 : 0;
+}
+
+/** The raw values an argument contributes to `concat`: a traced array's contents, a plain array, or the value itself. */
+function valuesOf(arg: unknown, argState: ArrayState | undefined): unknown[] {
+  if (argState) {
+    return argState.raw;
+  }
+  return Array.isArray(arg) ? arg : [arg];
 }
 
 function originAt(ids: readonly number[], index: number): number {
@@ -447,9 +463,9 @@ function isBad(value: unknown): boolean {
 /** Counts results that became bad although the input at the same position was usable. */
 function countIntroduced(inputs: readonly unknown[], outputs: readonly unknown[]): number {
   let count = 0;
-  for (let i = 0; i < outputs.length; i++) {
+  for (let i = 0; i < outputs.length; i += 1) {
     if (i in outputs && isBad(outputs[i]) && !isBad(inputs[i])) {
-      count++;
+      count += 1;
     }
   }
   return count;
@@ -459,7 +475,7 @@ function countIntroduced(inputs: readonly unknown[], outputs: readonly unknown[]
 function allIdentical(values: readonly unknown[]): boolean {
   let first: unknown;
   let seen = 0;
-  for (let i = 0; i < values.length; i++) {
+  for (let i = 0; i < values.length; i += 1) {
     if (!(i in values)) {
       continue;
     }
@@ -468,14 +484,14 @@ function allIdentical(values: readonly unknown[]): boolean {
     } else if (!Object.is(values[i], first)) {
       return false;
     }
-    seen++;
+    seen += 1;
   }
   return seen > 1;
 }
 
 function presentValues(values: readonly unknown[]): unknown[] {
   const out: unknown[] = [];
-  for (let i = 0; i < values.length; i++) {
+  for (let i = 0; i < values.length; i += 1) {
     if (i in values) {
       out.push(values[i]);
     }
@@ -484,5 +500,5 @@ function presentValues(values: readonly unknown[]): unknown[] {
 }
 
 function isNumericString(value: unknown): boolean {
-  return typeof value === "string" && /^\s*[-+]?\d+(\.\d+)?\s*$/.test(value);
+  return typeof value === "string" && NUMERIC_STRING.test(value);
 }

@@ -1,3 +1,4 @@
+// biome-ignore-all lint/performance/noBarrelFile: this is the package's public entry point, so re-exporting is its purpose
 export type { ConfigOptions, ExplainConfig } from "./config.js";
 export { configure, disable, enable, resetConfig } from "./config.js";
 export { ExplainError } from "./errors.js";

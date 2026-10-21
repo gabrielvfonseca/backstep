@@ -30,6 +30,7 @@ export function formatShort(value: unknown, redactKeys: RegExp): string {
   return render(value, { ...SHORT_LIMITS, redactKeys }, 0, new Set());
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: a single switch over the value kinds the formatter renders, kept together so the rendering rules read in one place
 function render(value: unknown, o: FormatOptions, depth: number, seen: Set<object>): string {
   switch (typeof value) {
     case "string":
@@ -84,7 +85,7 @@ function render(value: unknown, o: FormatOptions, depth: number, seen: Set<objec
       const items = obj as unknown[];
       const limit = Math.min(items.length, o.maxItems);
       const shown: string[] = [];
-      for (let i = 0; i < limit; i++) {
+      for (let i = 0; i < limit; i += 1) {
         shown.push(child(() => items[i], o, depth + 1, seen));
       }
       if (items.length > limit) {

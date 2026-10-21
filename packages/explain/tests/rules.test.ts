@@ -93,6 +93,7 @@ describe("branch coverage of unusual inputs", () => {
 
   it("marks a value that was deleted as unknown origin", () => {
     const { report } = run([1, 2, 3], (xs) => {
+      // biome-ignore lint/performance/noDelete: deleting an index is what creates the unknown-origin case under test
       delete (xs as Array<number | undefined>)[0];
       return xs.filter((x) => x !== 3);
     });

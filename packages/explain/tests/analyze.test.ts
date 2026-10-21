@@ -13,10 +13,10 @@ describe("divergence rules", () => {
   it("flags a filter that removes everything, with its most common reason", () => {
     const { report } = run([1, 2, 3], (xs) => xs.filter((x) => x > 10));
     expect(report.findings[0]).toMatchObject({
-      severity: "error",
       code: "collapsed",
-      step: 0,
       message: "removed all 3 element(s) (<anonymous> → false)",
+      severity: "error",
+      step: 0,
     });
     expect(report.divergedAt).toBe(0);
   });
@@ -39,7 +39,6 @@ describe("divergence rules", () => {
 
   it("flags a map callback that forgot to return", () => {
     const { report } = run([1, 2, 3], (xs) =>
-      // biome-ignore lint/suspicious/useIterableCallbackReturn: the missing return is the bug under test
       xs.map((x) => {
         void x;
       }),
@@ -74,9 +73,9 @@ describe("divergence rules", () => {
   it("warns when reduce returns its initial value because nothing reached it", () => {
     const { report } = run([] as number[], (xs) => xs.reduce((a, b) => a + b, 0));
     expect(report.findings.find((f) => f.code === "returned-initial")).toMatchObject({
+      message: "had no elements to combine and returned its initial value 0",
       severity: "warning",
       step: 0,
-      message: "had no elements to combine and returned its initial value 0",
     });
   });
 

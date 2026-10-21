@@ -3,7 +3,7 @@ import type { Drop, OpKind, Step, StepFacts } from "./types.js";
 
 /** Monotonic clock with a Date fallback, for environments without `performance`. */
 export function now(): number {
-  const perf = (globalThis as { performance?: { now(): number } }).performance;
+  const perf = (globalThis as { performance?: { now: () => number } }).performance;
   return perf ? perf.now() : Date.now();
 }
 
@@ -33,25 +33,28 @@ export function snapshot(value: unknown): unknown {
 export class Session {
   readonly steps: Step[] = [];
   readonly startedAt: number = now();
+  readonly name: string;
+  readonly maxSamples: number;
+  readonly redactKeys: RegExp;
 
-  constructor(
-    readonly name: string,
-    readonly maxSamples: number,
-    readonly redactKeys: RegExp,
-  ) {}
+  constructor(name: string, maxSamples: number, redactKeys: RegExp) {
+    this.name = name;
+    this.maxSamples = maxSamples;
+    this.redactKeys = redactKeys;
+  }
 }
 
 /** Collects one step. Exactly one of `commit` or `fail` takes effect; later calls are ignored. */
 export class StepRecorder {
   readonly facts: StepFacts = {
-    nonFiniteIntroduced: 0,
-    identicalOutputs: false,
-    nonNumericComparator: false,
-    returnedInitial: false,
-    numericStrings: false,
-    noMatch: false,
-    matchedOrigin: -1,
     defaultNumericSort: false,
+    identicalOutputs: false,
+    matchedOrigin: -1,
+    noMatch: false,
+    nonFiniteIntroduced: 0,
+    nonNumericComparator: false,
+    numericStrings: false,
+    returnedInitial: false,
   };
 
   private readonly dropped: Drop[] = [];
@@ -60,49 +63,52 @@ export class StepRecorder {
   private readonly inputCount: number;
   private readonly inputSample: readonly unknown[];
   private done = false;
+  private readonly session: Session;
+  private readonly kind: OpKind;
+  private readonly label: string;
 
-  constructor(
-    private readonly session: Session,
-    private readonly kind: OpKind,
-    private readonly label: string,
-    input: readonly unknown[],
-  ) {
+  constructor(session: Session, kind: OpKind, label: string, input: readonly unknown[]) {
+    this.session = session;
+    this.kind = kind;
+    this.label = label;
     this.inputCount = input.length;
     this.inputSample = input.slice(0, session.maxSamples).map(snapshot);
   }
 
   /** `reason` is computed only for sampled elements, so dropping many elements stays cheap. */
   drop(origin: number, value: unknown, reason: string | (() => string)): void {
-    this.droppedCount++;
+    this.droppedCount += 1;
     if (this.dropped.length < this.session.maxSamples) {
       const text = typeof reason === "string" ? reason : reason();
-      this.dropped.push({ origin, value: snapshot(value), reason: text });
+      this.dropped.push({ origin, reason: text, value: snapshot(value) });
     }
   }
 
   commit(output: readonly unknown[], outputCount: number, result?: { value: unknown }): void {
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: done is set by commit and fail, which the checker cannot follow from a field initialiser
     if (this.done) {
       return;
     }
     this.done = true;
     this.push({
+      error: undefined,
       outputCount,
       outputSample: output.slice(0, this.session.maxSamples).map(snapshot),
       result,
-      error: undefined,
     });
   }
 
   fail(error: unknown): void {
+    // biome-ignore lint/suspicious/noUnnecessaryConditions: done is set by commit and fail, which the checker cannot follow from a field initialiser
     if (this.done) {
       return;
     }
     this.done = true;
     this.push({
+      error: summarizeError(error),
       outputCount: 0,
       outputSample: [],
       result: undefined,
-      error: summarizeError(error),
     });
   }
 
@@ -113,19 +119,19 @@ export class StepRecorder {
     error: Step["error"];
   }): void {
     this.session.steps.push({
-      index: this.session.steps.length,
-      kind: this.kind,
-      label: this.label,
-      inputCount: this.inputCount,
-      outputCount: outcome.outputCount,
-      inputSample: this.inputSample,
-      outputSample: outcome.outputSample,
       dropped: this.dropped,
       droppedCount: this.droppedCount,
-      result: outcome.result,
+      durationMs: now() - this.started,
       error: outcome.error,
       facts: this.facts,
-      durationMs: now() - this.started,
+      index: this.session.steps.length,
+      inputCount: this.inputCount,
+      inputSample: this.inputSample,
+      kind: this.kind,
+      label: this.label,
+      outputCount: outcome.outputCount,
+      outputSample: outcome.outputSample,
+      result: outcome.result,
     });
   }
 }

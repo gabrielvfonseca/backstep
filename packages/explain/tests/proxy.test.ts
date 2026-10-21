@@ -3,15 +3,15 @@ import { resetForTest, run, stepKinds } from "./helpers.js";
 
 interface Item {
   id: string;
-  stock: number;
   price: number;
+  stock: number;
 }
 
 const items: Item[] = [
-  { id: "a1", stock: 2, price: 5 },
-  { id: "b2", stock: 0, price: 7 },
-  { id: "c3", stock: 4, price: 3 },
-  { id: "d4", stock: 0, price: 9 },
+  { id: "a1", price: 5, stock: 2 },
+  { id: "b2", price: 7, stock: 0 },
+  { id: "c3", price: 3, stock: 4 },
+  { id: "d4", price: 9, stock: 0 },
 ];
 
 describe("traced arrays behave like arrays", () => {
@@ -74,7 +74,7 @@ describe("traced arrays behave like arrays", () => {
 
   it("matches the native result for every traced method", () => {
     const nums = [5, 3, 8, 1, 9, 2];
-    const pipelines: Array<[string, (xs: number[]) => unknown]> = [
+    const pipelines: [string, (xs: number[]) => unknown][] = [
       ["filter", (xs) => xs.filter((x) => x > 2)],
       ["map", (xs) => xs.map((x) => x * 3)],
       ["flatMap", (xs) => xs.flatMap((x) => (x % 2 ? [x, x] : []))],
@@ -143,7 +143,7 @@ describe("lineage", () => {
 
   it("records the root index of dropped elements with the reason", () => {
     const { report } = run(items, (xs) => xs.filter((item) => item.stock > 0));
-    const step = report.steps[0];
+    const [step] = report.steps;
     expect(step?.kind).toBe("filter");
     expect(step?.droppedCount).toBe(2);
     expect(step?.dropped.map((d) => d.origin)).toEqual([1, 3]);
@@ -178,7 +178,7 @@ describe("lineage", () => {
 
   it("records find matches by root origin", () => {
     const { report } = run(items, (xs) => xs.filter((i) => i.stock > 0).find((i) => i.price > 4));
-    const find = report.steps[1];
+    const [, find] = report.steps;
     expect(find?.kind).toBe("find");
     expect(find?.facts.matchedOrigin).toBe(0);
     expect(find?.facts.noMatch).toBe(false);
