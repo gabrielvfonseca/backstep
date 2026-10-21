@@ -29,7 +29,7 @@ importers:
 
   apps/playground:
     dependencies:
-      '@gabrielvfonseca/backstep':
+      backstep:
         specifier: workspace:*
         version: link:../../packages/backstep
 
@@ -74,7 +74,7 @@ importers:
       '@backstep/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
-      '@gabrielvfonseca/backstep':
+      backstep:
         specifier: workspace:*
         version: link:../backstep
       typescript:

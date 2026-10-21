@@ -19,7 +19,7 @@ const total = trace("order.total", order.items, (__backstep_input) =>
 
 ```ts
 import { build } from "esbuild";
-import { valueLineage } from "@gabrielvfonseca/backstep/esbuild";
+import { valueLineage } from "backstep/esbuild";
 
 await build({
   entryPoints: ["src/index.ts"],
@@ -41,7 +41,7 @@ npm install --save-dev esbuild @babel/parser
 For other bundlers, call `transformSource` from a plugin hook:
 
 ```ts
-import { transformSource } from "@gabrielvfonseca/backstep/transform";
+import { transformSource } from "backstep/transform";
 
 const { code, changed } = transformSource(source, "path/to/file.ts");
 ```
@@ -50,7 +50,7 @@ const { code, changed } = transformSource(source, "path/to/file.ts");
 
 ## What gets rewritten
 
-- Only calls to `trace` imported from `@gabrielvfonseca/backstep`, or through a namespace import.
+- Only calls to `trace` imported from `backstep`, or through a namespace import.
 - Only callbacks that take no arguments and return a chain of array methods over one receiver.
   Supported methods: `filter`, `map`, `flatMap`, `reduce`, `reduceRight`, `find`, `findIndex`,
   `findLast`, `findLastIndex`, `some`, `every`, `sort`, `toSorted`, `slice`.

@@ -1,4 +1,4 @@
-import { trace } from "@gabrielvfonseca/backstep";
+import { trace } from "backstep";
 
 // Every item is marked unavailable, so the total silently comes out as 0.
 const order = {

@@ -4,7 +4,7 @@
 `configure()` called without arguments.
 
 ```ts
-import { configure } from "@gabrielvfonseca/backstep";
+import { configure } from "backstep";
 
 configure({
   always: false,

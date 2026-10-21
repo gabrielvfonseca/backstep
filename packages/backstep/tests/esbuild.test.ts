@@ -24,7 +24,7 @@ describe("valueLineage esbuild plugin", () => {
     await writeFile(
       entry,
       [
-        'import { trace } from "@gabrielvfonseca/backstep";',
+        'import { trace } from "backstep";',
         "const order = { items: [{ stock: 0 }, { stock: 0 }] };",
         'export const total = trace("order.total", () =>',
         "  order.items.filter((i) => i.stock > 0).map((i) => i.stock).reduce((a, b) => a + b, 0),",
@@ -34,7 +34,7 @@ describe("valueLineage esbuild plugin", () => {
     );
 
     const result = await esbuild.build({
-      alias: { "@gabrielvfonseca/backstep": libraryEntry },
+      alias: { backstep: libraryEntry },
       bundle: true,
       entryPoints: [entry],
       format: "cjs",

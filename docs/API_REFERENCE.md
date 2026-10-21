@@ -1,6 +1,6 @@
 # API reference
 
-All exports come from `@gabrielvfonseca/backstep`.
+All exports come from `backstep`.
 
 ## `trace(name, input, fn, options?)`
 
@@ -88,5 +88,5 @@ Thrown for misuse of the library: an invalid configuration, or a promise returne
 
 | Import | Purpose |
 | --- | --- |
-| `@gabrielvfonseca/backstep/esbuild` | esbuild plugin that rewrites inline chains. See [Build plugin](BUILD_PLUGIN.md). |
-| `@gabrielvfonseca/backstep/transform` | `transformSource(code, filename)` for other bundlers. |
+| `backstep/esbuild` | esbuild plugin that rewrites inline chains. See [Build plugin](BUILD_PLUGIN.md). |
+| `backstep/transform` | `transformSource(code, filename)` for other bundlers. |

@@ -1,27 +1,15 @@
 # Getting started
 
-`@gabrielvfonseca/backstep` shows how a value reached an unexpected state. You wrap an array
+`backstep` shows how a value reached an unexpected state. You wrap an array
 pipeline in `trace`. When the result looks wrong, the library prints which step caused it and
 which elements it removed.
 
 ## Install
 
-The package is published to GitHub Packages. Point the scope at that registry in your project's
-`.npmrc`:
-
-```ini
-@gabrielvfonseca:registry=https://npm.pkg.github.com
-```
-
-Authenticate in your user-level `~/.npmrc` (not the project file), with a token that has
-`read:packages`:
-
-```ini
-//npm.pkg.github.com/:_authToken=<your token>
-```
+Install from npm:
 
 ```sh
-npm install @gabrielvfonseca/backstep
+npm install backstep
 ```
 
 Requirements: Node 20 or newer. The runtime `trace` has no dependencies and works in browsers. The
@@ -30,7 +18,7 @@ build plugin needs `esbuild` and `@babel/parser`, which are optional peer depend
 ## First trace
 
 ```ts
-import { trace } from "@gabrielvfonseca/backstep";
+import { trace } from "backstep";
 
 const total = trace("order.total", order.items, (items) =>
   items.filter(isAvailable).map(getPrice).reduce((a, b) => a + b, 0),

@@ -1,5 +1,5 @@
 {
-  "name": "@gabrielvfonseca/backstep",
+  "name": "backstep",
   "version": "0.1.0",
   "description": "Explains how a value got into an unexpected state. Records the lineage of array pipelines and reports the step where the result diverged.",
   "keywords": [
@@ -101,7 +101,7 @@
     "node": ">=20"
   },
   "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
+    "access": "public",
+    "provenance": true
   }
 }

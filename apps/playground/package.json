@@ -10,6 +10,6 @@
     "typecheck": "echo 'playground is plain JavaScript'"
   },
   "dependencies": {
-    "@gabrielvfonseca/backstep": "workspace:*"
+    "backstep": "workspace:*"
   }
 }

@@ -1,7 +1,6 @@
 # Releasing
 
-The package is published to GitHub Packages as `@gabrielvfonseca/backstep`. GitHub Packages
-requires the scope to match the owning account.
+The package is published to npm as `backstep`.
 
 ## Before a release
 
@@ -27,21 +26,23 @@ requires the scope to match the owning account.
    ```
 
 2. Commit the result and push to `main`.
-3. Publish from the package directory. Pass the token through an environment variable, so it is
-   never written to disk:
+3. Log in to npm once, as the account that owns the package:
+
+   ```sh
+   npm login
+   ```
+
+4. Publish from the package directory:
 
    ```sh
    cd packages/backstep
-   TOKEN="$(gh auth token)"
-   env "npm_config_//npm.pkg.github.com/:_authToken=$TOKEN" \
-     npm publish --registry https://npm.pkg.github.com --access restricted
-   unset TOKEN
+   npm publish
    ```
 
-4. Confirm the published version:
+   `publishConfig` in `package.json` sets public access and provenance.
+
+5. Confirm the published version:
 
    ```sh
-   npm view @gabrielvfonseca/backstep version --registry https://npm.pkg.github.com
+   npm view backstep version
    ```
-
-The token needs the `write:packages` scope. Consumers need `read:packages` on the repository.

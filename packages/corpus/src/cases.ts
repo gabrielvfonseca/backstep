@@ -1,4 +1,4 @@
-import { type Finding, type TraceReport, traceReport } from "@gabrielvfonseca/backstep";
+import { type Finding, type TraceReport, traceReport } from "backstep";
 
 /**
  * A realistic bug in an array pipeline. `expected` names the step (0-based) where the report

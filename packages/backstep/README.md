@@ -1,4 +1,4 @@
-# @gabrielvfonseca/backstep
+# backstep
 
 **How did this value get into this state?**
 
@@ -7,7 +7,7 @@ tells you the step where it went wrong and why. It replaces the `console.log` ar
 "which filter dropped my items?".
 
 ```ts
-import { trace } from "@gabrielvfonseca/backstep";
+import { trace } from "backstep";
 
 const total = trace("order.total", order.items, (items) =>
   items
@@ -35,17 +35,10 @@ can find it in your data. Nothing is logged when the result is fine.
 
 ## Install
 
-The package is published to GitHub Packages under the `@gabrielvfonseca` scope. Point that scope
-at the GitHub registry, authenticating with a token that has `read:packages`:
-
-```ini
-# .npmrc
-@gabrielvfonseca:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
-```
+Install from npm:
 
 ```sh
-npm install @gabrielvfonseca/backstep
+npm install backstep
 ```
 
 Requires Node 20 or newer. The runtime `trace` has no dependencies and also works in browsers. The
@@ -107,7 +100,7 @@ report.toJSON(); // plain data, safe to serialise
 If the callback throws, `trace` rethrows the same error and attaches the partial report:
 
 ```ts
-import { getReport } from "@gabrielvfonseca/backstep";
+import { getReport } from "backstep";
 
 try {
   trace("orders", orders, (xs) => xs.map(toLine).reduce(sum));
@@ -135,30 +128,30 @@ const total = trace("order.total", order.items, (__backstep_input) =>
 Enable it in esbuild (and tsup, which uses esbuild):
 
 ```ts
-import { valueLineage } from "@gabrielvfonseca/backstep/esbuild";
+import { valueLineage } from "backstep/esbuild";
 
 build({ plugins: [valueLineage()] });
 ```
 
-The plugin only touches files that import `trace` from `@gabrielvfonseca/backstep` (or through a namespace
+The plugin only touches files that import `trace` from `backstep` (or through a namespace
 import), and only callbacks that take no arguments and whose body is a chain of array methods over
 one receiver. Other calls are left exactly as written. Files under `node_modules` are skipped.
 
 For other bundlers, the same rewrite is available as a plain function:
 
 ```ts
-import { transformSource } from "@gabrielvfonseca/backstep/transform";
+import { transformSource } from "backstep/transform";
 
 const { code, changed } = transformSource(source, "path/to/file.ts");
 ```
 
-The plugin needs `esbuild` (for `@gabrielvfonseca/backstep/esbuild`) and `@babel/parser` (for both entries).
+The plugin needs `esbuild` (for `backstep/esbuild`) and `@babel/parser` (for both entries).
 Both are optional peer dependencies, so the runtime `trace` has no dependencies.
 
 ### Configuration
 
 ```ts
-import { configure, enable, disable } from "@gabrielvfonseca/backstep";
+import { configure, enable, disable } from "backstep";
 
 configure({
   enabled: true, // see "When tracing is on" below
@@ -237,7 +230,7 @@ Findings with severity `error` or `warning` count as divergence. The first such 
 ## Performance
 
 Measured with `vitest bench` on a 100,000-element `filter → map → reduce` pipeline (noisy
-machine-specific numbers; run `pnpm --filter @gabrielvfonseca/backstep bench` locally):
+machine-specific numbers; run `pnpm --filter backstep bench` locally):
 
 | Mode     | Relative to native      |
 | -------- | ----------------------- |

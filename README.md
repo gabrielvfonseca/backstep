@@ -1,12 +1,12 @@
-# backstep
+# Backstep
 
 **How did this value get into this state?**
 
-`@gabrielvfonseca/backstep` records how elements flow through an array pipeline. When the
+`backstep` records how elements flow through an array pipeline. When the
 result looks wrong, it reports the step that caused it and the elements that step removed.
 
 ```ts
-import { trace } from "@gabrielvfonseca/backstep";
+import { trace } from "backstep";
 
 const total = trace("order.total", order.items, (items) =>
   items.filter(isAvailable).map(getPrice).reduce((a, b) => a + b, 0),
@@ -18,7 +18,7 @@ Documentation starts at [docs/INDEX.md](docs/INDEX.md). The package README is at
 
 ## Status
 
-- Version 0.1.0 is published to GitHub Packages as `@gabrielvfonseca/backstep`.
+- Version 0.1.0 is published to npm as `backstep`.
 - It has not yet been validated with real users. The bug corpus is written by the author. See
   [docs/VALIDATION.md](docs/VALIDATION.md).
 
@@ -26,7 +26,7 @@ Documentation starts at [docs/INDEX.md](docs/INDEX.md). The package README is at
 
 | Path                 | What it is                                                     |
 | -------------------- | -------------------------------------------------------------- |
-| `packages/backstep`   | The library (`@gabrielvfonseca/backstep`)                 |
+| `packages/backstep`   | The library (`backstep`)                 |
 | `packages/corpus`    | 14 realistic pipeline bugs the library must diagnose (private) |
 | `packages/tsconfig`  | Shared TypeScript configuration (private)                      |
 | `apps/playground`    | Runnable examples (private)                                    |
@@ -64,7 +64,7 @@ pnpm changeset      # describe a user-visible change before merging
 ## Continuous integration
 
 CI runs lint, typecheck, build, test and package checks on Node 20, 22 and 24. The release
-workflow versions with Changesets. Publishing to GitHub Packages is described in
+workflow versions with Changesets. Publishing is described in
 [docs/RELEASING.md](docs/RELEASING.md).
 
 ## License

@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@backstep/tsconfig": "workspace:*",
-    "@gabrielvfonseca/backstep": "workspace:*",
+    "backstep": "workspace:*",
     "typescript": "~5.9.3",
     "vitest": "^4.1.12"
   }

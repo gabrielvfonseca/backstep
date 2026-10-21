@@ -1,6 +1,6 @@
 ---
 name: backstep
-description: Debug an unexpected value in a JavaScript or TypeScript array pipeline using @gabrielvfonseca/backstep. Use when a filter, map, reduce, sort or find returns a surprising result such as 0, NaN, an empty array or the wrong order, or when the user asks how a value got into a state. Covers wrapping a pipeline in trace, reading the report, and the build plugin for inline chains.
+description: Debug an unexpected value in a JavaScript or TypeScript array pipeline using backstep. Use when a filter, map, reduce, sort or find returns a surprising result such as 0, NaN, an empty array or the wrong order, or when the user asks how a value got into a state. Covers wrapping a pipeline in trace, reading the report, and the build plugin for inline chains.
 ---
 
 # Debugging with backstep
@@ -17,7 +17,7 @@ obvious from reading the code.
    in place of the array:
 
    ```ts
-   import { trace } from "@gabrielvfonseca/backstep";
+   import { trace } from "backstep";
 
    const total = trace("order.total", order.items, (items) =>
      items.filter(isAvailable).map(getPrice).reduce((a, b) => a + b, 0),

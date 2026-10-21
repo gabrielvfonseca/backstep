@@ -1,4 +1,4 @@
-import { trace } from "@gabrielvfonseca/backstep";
+import { trace } from "backstep";
 
 // A boolean comparator looks reasonable but does not sort reliably.
 const prices = [30, 10, 20];

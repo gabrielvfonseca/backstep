@@ -1,6 +1,6 @@
 ---
 name: backstep-rule-authoring
-description: Add or change a divergence rule (a finding) in @gabrielvfonseca/backstep. Use when a new kind of array bug should be reported, when an existing finding needs a different threshold or message, or when a corpus case shows the library missing a bug. Covers recording facts in proxy.ts, the rule in analyze.ts, tests, and a corpus case.
+description: Add or change a divergence rule (a finding) in backstep. Use when a new kind of array bug should be reported, when an existing finding needs a different threshold or message, or when a corpus case shows the library missing a bug. Covers recording facts in proxy.ts, the rule in analyze.ts, tests, and a corpus case.
 ---
 
 # Authoring a divergence rule
