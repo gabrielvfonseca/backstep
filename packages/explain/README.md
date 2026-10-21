@@ -1,4 +1,4 @@
-# value-lineage
+# @gabrielvfonseca/value-lineage
 
 **How did this value get into this state?**
 
@@ -7,7 +7,7 @@ tells you the step where it went wrong and why. It replaces the `console.log` ar
 "which filter dropped my items?".
 
 ```ts
-import { trace } from "value-lineage";
+import { trace } from "@gabrielvfonseca/value-lineage";
 
 const total = trace("order.total", order.items, (items) =>
   items
@@ -35,11 +35,21 @@ can find it in your data. Nothing is logged when the result is fine.
 
 ## Install
 
-```sh
-npm install explain
+The package is published to GitHub Packages under the `@gabrielvfonseca` scope. Point that scope
+at the GitHub registry, authenticating with a token that has `read:packages`:
+
+```ini
+# .npmrc
+@gabrielvfonseca:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
 ```
 
-Requires Node 20 or newer. The package has no runtime dependencies and also works in browsers.
+```sh
+npm install @gabrielvfonseca/value-lineage
+```
+
+Requires Node 20 or newer. The runtime `trace` has no dependencies and also works in browsers. The
+build plugin needs the optional peer dependencies `esbuild` and `@babel/parser`.
 
 ## Usage
 
@@ -97,7 +107,7 @@ report.toJSON(); // plain data, safe to serialise
 If the callback throws, `trace` rethrows the same error and attaches the partial report:
 
 ```ts
-import { getReport } from "value-lineage";
+import { getReport } from "@gabrielvfonseca/value-lineage";
 
 try {
   trace("orders", orders, (xs) => xs.map(toLine).reduce(sum));
@@ -125,30 +135,30 @@ const total = trace("order.total", order.items, (__explain_input) =>
 Enable it in esbuild (and tsup, which uses esbuild):
 
 ```ts
-import { valueLineage } from "value-lineage/esbuild";
+import { valueLineage } from "@gabrielvfonseca/value-lineage/esbuild";
 
 build({ plugins: [valueLineage()] });
 ```
 
-The plugin only touches files that import `trace` from `value-lineage` (or through a namespace
+The plugin only touches files that import `trace` from `@gabrielvfonseca/value-lineage` (or through a namespace
 import), and only callbacks that take no arguments and whose body is a chain of array methods over
 one receiver. Other calls are left exactly as written. Files under `node_modules` are skipped.
 
 For other bundlers, the same rewrite is available as a plain function:
 
 ```ts
-import { transformSource } from "value-lineage/transform";
+import { transformSource } from "@gabrielvfonseca/value-lineage/transform";
 
 const { code, changed } = transformSource(source, "path/to/file.ts");
 ```
 
-The plugin needs `esbuild` (for `value-lineage/esbuild`) and `@babel/parser` (for both entries).
+The plugin needs `esbuild` (for `@gabrielvfonseca/value-lineage/esbuild`) and `@babel/parser` (for both entries).
 Both are optional peer dependencies, so the runtime `trace` has no dependencies.
 
 ### Configuration
 
 ```ts
-import { configure, enable, disable } from "value-lineage";
+import { configure, enable, disable } from "@gabrielvfonseca/value-lineage";
 
 configure({
   enabled: true, // see "When tracing is on" below
@@ -227,7 +237,7 @@ Findings with severity `error` or `warning` count as divergence. The first such 
 ## Performance
 
 Measured with `vitest bench` on a 100,000-element `filter → map → reduce` pipeline (noisy
-machine-specific numbers; run `pnpm --filter value-lineage bench` locally):
+machine-specific numbers; run `pnpm --filter @gabrielvfonseca/value-lineage bench` locally):
 
 | Mode     | Relative to native      |
 | -------- | ----------------------- |

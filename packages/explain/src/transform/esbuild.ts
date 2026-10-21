@@ -6,12 +6,12 @@ import { transformSource } from "./index.js";
  * esbuild plugin that applies the inline-chain transform to project source files. Files under
  * node_modules are never touched.
  *
- *   import { valueLineage } from "value-lineage/esbuild";
+ *   import { valueLineage } from "@gabrielvfonseca/value-lineage/esbuild";
  *   build({ plugins: [valueLineage()] });
  */
 export function valueLineage(): Plugin {
   return {
-    name: "value-lineage",
+    name: "@gabrielvfonseca/value-lineage",
     setup(build) {
       build.onLoad({ filter: /\.[cm]?[jt]sx?$/ }, async (args) => {
         if (args.path.includes("/node_modules/")) {

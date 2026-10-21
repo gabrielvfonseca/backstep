@@ -9,7 +9,7 @@ import { parse } from "@babel/parser";
  *
  *   trace("name", order.items, (__explain_input) => __explain_input.filter(f).map(g))
  *
- * Only calls to `trace` imported from "value-lineage" are touched, and only when the callback is a
+ * Only calls to `trace` imported from "@gabrielvfonseca/value-lineage" are touched, and only when the callback is a
  * zero-argument arrow whose body is a chain of array methods over a single receiver.
  */
 
@@ -36,7 +36,7 @@ const ARRAY_METHODS = new Set([
   "slice",
 ]);
 
-const PACKAGE = "value-lineage";
+const PACKAGE = "@gabrielvfonseca/value-lineage";
 const PARAM = "__explain_input";
 
 interface Node {

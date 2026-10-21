@@ -1,4 +1,4 @@
-import { trace } from "value-lineage";
+import { trace } from "@gabrielvfonseca/value-lineage";
 
 // Every item is marked unavailable, so the total silently comes out as 0.
 const order = {

@@ -1,5 +1,7 @@
 # value-lineage
 
+Published as `@gabrielvfonseca/value-lineage` on GitHub Packages.
+
 A debugging library that records how values flow through array pipelines and explains where an
 unexpected result came from. The published package is documented in
 [`packages/explain/README.md`](packages/explain/README.md).

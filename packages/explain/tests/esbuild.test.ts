@@ -24,7 +24,7 @@ describe("valueLineage esbuild plugin", () => {
     await writeFile(
       entry,
       [
-        'import { trace } from "value-lineage";',
+        'import { trace } from "@gabrielvfonseca/value-lineage";',
         "const order = { items: [{ stock: 0 }, { stock: 0 }] };",
         'export const total = trace("order.total", () =>',
         "  order.items.filter((i) => i.stock > 0).map((i) => i.stock).reduce((a, b) => a + b, 0),",
@@ -39,7 +39,7 @@ describe("valueLineage esbuild plugin", () => {
       write: false,
       format: "cjs",
       platform: "node",
-      alias: { "value-lineage": libraryEntry },
+      alias: { "@gabrielvfonseca/value-lineage": libraryEntry },
       plugins: [valueLineage()],
       logLevel: "silent",
     });

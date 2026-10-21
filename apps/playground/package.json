@@ -10,6 +10,6 @@
     "clean": "echo 'nothing to clean'"
   },
   "dependencies": {
-    "value-lineage": "workspace:*"
+    "@gabrielvfonseca/value-lineage": "workspace:*"
   }
 }

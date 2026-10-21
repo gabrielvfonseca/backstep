@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@explain/tsconfig": "workspace:*",
-    "value-lineage": "workspace:*",
+    "@gabrielvfonseca/value-lineage": "workspace:*",
     "typescript": "~5.9.3",
     "vitest": "^4.1.12"
   }

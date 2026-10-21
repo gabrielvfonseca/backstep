@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { transformSource } from "../src/transform/index.js";
 
-const header = 'import { trace } from "value-lineage";\n';
+const header = 'import { trace } from "@gabrielvfonseca/value-lineage";\n';
 
 describe("transformSource", () => {
   it("rewrites an expression-bodied chain to the explicit-input form", () => {
@@ -35,7 +35,7 @@ describe("transformSource", () => {
 
   it("works through a namespace import", () => {
     const { code, changed } = transformSource(
-      'import * as vl from "value-lineage";\nvl.trace("x", () => data.some(ok));',
+      'import * as vl from "@gabrielvfonseca/value-lineage";\nvl.trace("x", () => data.some(ok));',
       "a.js",
     );
     expect(changed).toBe(true);

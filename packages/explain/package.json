@@ -1,6 +1,6 @@
 {
-  "name": "value-lineage",
-  "version": "0.0.0",
+  "name": "@gabrielvfonseca/value-lineage",
+  "version": "0.1.0",
   "description": "Explain how a value got into an unexpected state. Records the lineage of array pipelines and reports the step where the result diverged.",
   "keywords": [
     "debug",
@@ -61,8 +61,8 @@
     "node": ">=20"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "scripts": {
     "build": "tsup",
@@ -98,5 +98,10 @@
     "esbuild": {
       "optional": true
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabrielvfonseca/explain.git",
+    "directory": "packages/explain"
   }
 }

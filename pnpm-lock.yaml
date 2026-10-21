@@ -22,7 +22,7 @@ importers:
 
   apps/playground:
     dependencies:
-      value-lineage:
+      "@gabrielvfonseca/value-lineage":
         specifier: workspace:*
         version: link:../../packages/explain
 
@@ -31,12 +31,12 @@ importers:
       "@explain/tsconfig":
         specifier: workspace:*
         version: link:../tsconfig
+      "@gabrielvfonseca/value-lineage":
+        specifier: workspace:*
+        version: link:../explain
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
-      value-lineage:
-        specifier: workspace:*
-        version: link:../explain
       vitest:
         specifier: ^4.1.12
         version: 4.1.12(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2))
