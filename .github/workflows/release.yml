@@ -23,7 +23,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
       - run: pnpm test
-      - uses: changesets/action@v1
+      - uses: changesets/action@v2
         with:
           version: pnpm changeset version
           publish: pnpm changeset publish
