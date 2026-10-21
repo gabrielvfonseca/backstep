@@ -11,12 +11,12 @@ const JSX_FILE = /\.jsx$/;
  * esbuild plugin that applies the inline-chain transform to project source files. Files under
  * node_modules are never touched.
  *
- *   import { valueLineage } from "@gabrielvfonseca/value-lineage/esbuild";
+ *   import { valueLineage } from "@gabrielvfonseca/backstep/esbuild";
  *   build({ plugins: [valueLineage()] });
  */
 export function valueLineage(): Plugin {
   return {
-    name: "@gabrielvfonseca/value-lineage",
+    name: "@gabrielvfonseca/backstep",
     setup(build) {
       build.onLoad({ filter: SOURCE_FILE }, async (args) => {
         if (args.path.includes("/node_modules/")) {

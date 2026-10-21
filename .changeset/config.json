@@ -7,5 +7,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@explain/corpus", "@explain/playground"]
+  "ignore": ["@backstep/corpus", "@backstep/playground"]
 }

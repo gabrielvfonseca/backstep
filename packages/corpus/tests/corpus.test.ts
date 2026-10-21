@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { cases } from "../src/cases.js";
 
-describe("bug corpus: explain points at the real cause", () => {
+describe("bug corpus: backstep points at the real cause", () => {
   for (const testCase of cases) {
     it(`${testCase.id}: ${testCase.title}`, () => {
       const report = testCase.run();

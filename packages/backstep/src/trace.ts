@@ -1,13 +1,13 @@
 import { analyze, firstDivergence } from "./analyze.js";
-import { type ExplainConfig, getConfig, toFormatOptions } from "./config.js";
-import { ExplainError, summarizeError } from "./errors.js";
+import { type BackstepConfig, getConfig, toFormatOptions } from "./config.js";
+import { BackstepError, summarizeError } from "./errors.js";
 import { unwrapResult, wrapArray } from "./proxy.js";
 import { now, Session, snapshot } from "./recorder.js";
 import { type ReportData, type ReportInput, TraceReport } from "./report.js";
 import type { StepError } from "./types.js";
 
 /** Symbol under which a failed trace attaches its report to the thrown error. */
-export const EXPLAIN_REPORT = Symbol.for("explain.report");
+export const BACKSTEP_REPORT = Symbol.for("backstep.report");
 
 export interface TraceOptions<R = unknown> {
   /** Emit the report even when nothing diverged. */
@@ -82,7 +82,7 @@ export async function traceAsync<I, R>(
 /**
  * Like `trace`, but always records and returns the report, regardless of configuration or
  * whether a divergence was found. Intended for tooling and tests. If `fn` throws, the report is
- * attached to the error under `EXPLAIN_REPORT`.
+ * attached to the error under `BACKSTEP_REPORT`.
  */
 export function traceReport<I, R>(
   name: string,
@@ -103,7 +103,7 @@ export function getReport(error: unknown): TraceReport | undefined {
   if (typeof error !== "object" || error === null) {
     return undefined;
   }
-  const report = (error as Record<symbol, unknown>)[EXPLAIN_REPORT];
+  const report = (error as Record<symbol, unknown>)[BACKSTEP_REPORT];
   return report instanceof TraceReport ? report : undefined;
 }
 
@@ -112,7 +112,7 @@ function execute<I>(
   input: I,
   fn: (traced: I) => unknown,
   options: TraceOptions<unknown>,
-  config: ExplainConfig,
+  config: BackstepConfig,
 ): Outcome {
   const session = new Session(name, config.maxSamples, config.redactKeys);
   const reportInput = describeInput(input, config.maxSamples);
@@ -126,7 +126,7 @@ function execute<I>(
   try {
     value = fn(traced as I);
     if (isThenable(value)) {
-      throw new ExplainError(
+      throw new BackstepError(
         `trace("${name}") received a promise. Use traceAsync for callbacks that await.`,
       );
     }
@@ -142,7 +142,7 @@ async function executeAsync<I>(
   input: I,
   fn: (traced: I) => unknown,
   options: TraceOptions<unknown>,
-  config: ExplainConfig,
+  config: BackstepConfig,
 ): Promise<Outcome> {
   const session = new Session(name, config.maxSamples, config.redactKeys);
   const reportInput = describeInput(input, config.maxSamples);
@@ -167,7 +167,7 @@ function finish(
   input: ReportInput,
   raw: { readonly failed: boolean; readonly error: unknown; readonly value: unknown },
   options: TraceOptions<unknown>,
-  config: ExplainConfig,
+  config: BackstepConfig,
 ): Outcome {
   const result = raw.failed ? undefined : unwrapResult(raw.value);
   const report = buildReport(
@@ -185,7 +185,7 @@ function buildReport(
   input: ReportInput,
   outcome: { readonly failed: boolean; readonly error: unknown; readonly result: unknown },
   options: TraceOptions<unknown>,
-  config: ExplainConfig,
+  config: BackstepConfig,
 ): TraceReport {
   const error: StepError | undefined = outcome.failed ? summarizeError(outcome.error) : undefined;
   const findings = analyze(session.steps, {
@@ -232,7 +232,7 @@ function emit(
     sink(report);
   } catch (error) {
     // A faulty sink must never break the program being debugged.
-    console.error("[explain] onReport threw:", error);
+    console.error("[backstep] onReport threw:", error);
   }
 }
 
@@ -241,7 +241,7 @@ function attachReport(error: unknown, report: TraceReport): void {
     return;
   }
   try {
-    Object.defineProperty(error, EXPLAIN_REPORT, {
+    Object.defineProperty(error, BACKSTEP_REPORT, {
       configurable: true,
       enumerable: false,
       value: report,

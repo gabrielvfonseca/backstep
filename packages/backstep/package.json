@@ -1,7 +1,7 @@
 {
-  "name": "@gabrielvfonseca/value-lineage",
+  "name": "@gabrielvfonseca/backstep",
   "version": "0.1.0",
-  "description": "Explain how a value got into an unexpected state. Records the lineage of array pipelines and reports the step where the result diverged.",
+  "description": "Explains how a value got into an unexpected state. Records the lineage of array pipelines and reports the step where the result diverged.",
   "keywords": [
     "debug",
     "debugging",
@@ -15,7 +15,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gabrielvfonseca/explain.git",
-    "directory": "packages/explain"
+    "directory": "packages/backstep"
   },
   "license": "MIT",
   "sideEffects": false,
@@ -75,7 +75,7 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@babel/parser": "^8.0.7",
-    "@explain/tsconfig": "workspace:*",
+    "@backstep/tsconfig": "workspace:*",
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^4.1.12",
     "esbuild": "^0.28.2",

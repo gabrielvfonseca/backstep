@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  BackstepError,
   configure,
-  ExplainError,
   getReport,
   resetConfig,
   trace,
@@ -68,7 +68,7 @@ describe("traceAsync", () => {
 
   it("points sync callers that return a promise to traceAsync", () => {
     expect(() => trace("sync-async", [1], async (xs) => xs.length)).toThrow(/Use traceAsync/);
-    expect(() => trace("sync-async", [1], async (xs) => xs.length)).toThrow(ExplainError);
+    expect(() => trace("sync-async", [1], async (xs) => xs.length)).toThrow(BackstepError);
   });
 
   it("applies expect to the resolved value", async () => {

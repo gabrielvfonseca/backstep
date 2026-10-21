@@ -1,10 +1,10 @@
 import type { StepError } from "./types.js";
 
-/** Thrown for misuse of explain itself, such as an invalid configuration or an async callback. */
-export class ExplainError extends Error {
+/** Thrown for misuse of backstep itself, such as an invalid configuration or an async callback. */
+export class BackstepError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "ExplainError";
+    this.name = "BackstepError";
   }
 }
 

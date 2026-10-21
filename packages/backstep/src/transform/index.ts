@@ -10,9 +10,9 @@ const TS_FILE = /\.ts$|\.mts$|\.cts$/;
  *
  * into the explicit-input form the runtime already traces:
  *
- *   trace("name", order.items, (__explain_input) => __explain_input.filter(f).map(g))
+ *   trace("name", order.items, (__backstep_input) => __backstep_input.filter(f).map(g))
  *
- * Only calls to `trace` imported from "@gabrielvfonseca/value-lineage" are touched, and only when the callback is a
+ * Only calls to `trace` imported from "@gabrielvfonseca/backstep" are touched, and only when the callback is a
  * zero-argument arrow whose body is a chain of array methods over a single receiver.
  */
 
@@ -39,8 +39,8 @@ const ARRAY_METHODS = new Set([
   "slice",
 ]);
 
-const PACKAGE = "@gabrielvfonseca/value-lineage";
-const PARAM = "__explain_input";
+const PACKAGE = "@gabrielvfonseca/backstep";
+const PARAM = "__backstep_input";
 
 interface Node {
   readonly end: number;

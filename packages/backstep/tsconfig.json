@@ -1,5 +1,5 @@
 {
-  "extends": "@explain/tsconfig/library.json",
+  "extends": "@backstep/tsconfig/library.json",
   "compilerOptions": {
     "rootDir": ".",
     "noEmit": true,

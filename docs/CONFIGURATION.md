@@ -4,7 +4,7 @@
 `configure()` called without arguments.
 
 ```ts
-import { configure } from "@gabrielvfonseca/value-lineage";
+import { configure } from "@gabrielvfonseca/backstep";
 
 configure({
   always: false,
@@ -32,8 +32,8 @@ configure({
 
 The default is decided once, when the module loads:
 
-1. If `EXPLAIN` is `1`, `true`, `yes` or `on`, tracing is on.
-2. If `EXPLAIN` is `0`, `false`, `no` or `off`, tracing is off.
+1. If `BACKSTEP` is `1`, `true`, `yes` or `on`, tracing is on.
+2. If `BACKSTEP` is `0`, `false`, `no` or `off`, tracing is off.
 3. Otherwise, tracing is on when `NODE_ENV` is `development` or `test`.
 4. Without a `process` object (browsers), tracing is off until you call `enable()`.
 

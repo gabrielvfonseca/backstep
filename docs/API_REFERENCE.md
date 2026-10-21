@@ -1,6 +1,6 @@
 # API reference
 
-All exports come from `@gabrielvfonseca/value-lineage`.
+All exports come from `@gabrielvfonseca/backstep`.
 
 ## `trace(name, input, fn, options?)`
 
@@ -19,7 +19,7 @@ When tracing is disabled, `trace` calls `fn(input)` directly.
 If `fn` throws, `trace` rethrows the same error with the partial report attached. Read it with
 `getReport(error)`.
 
-If `fn` returns a promise, `trace` throws an `ExplainError` that points to `traceAsync`.
+If `fn` returns a promise, `trace` throws an `BackstepError` that points to `traceAsync`.
 
 ## `traceAsync(name, input, fn, options?)`
 
@@ -72,21 +72,21 @@ Returns the `TraceReport` attached to an error thrown from a traced run, or `und
 ## `configure(options)`, `enable()`, `disable()`, `resetConfig()`
 
 See [Configuration](CONFIGURATION.md). `configure` merges the given options into the current
-configuration and validates them. Invalid values throw `ExplainError`.
+configuration and validates them. Invalid values throw `BackstepError`.
 
-## `ExplainError`
+## `BackstepError`
 
 Thrown for misuse of the library: an invalid configuration, or a promise returned from `trace`.
 
 ## Types
 
 `Step`, `StepFacts`, `StepError`, `Drop`, `Finding`, `FindingCode`, `OpKind`, `Severity`,
-`ExplainConfig`, `ConfigOptions`, `TraceOptions`, `TracedResult`, `ReportData`, `ReportInput`,
+`BackstepConfig`, `ConfigOptions`, `TraceOptions`, `TracedResult`, `ReportData`, `ReportInput`,
 `RenderOptions`. All are exported from the package root.
 
 ## Subpath exports
 
 | Import | Purpose |
 | --- | --- |
-| `@gabrielvfonseca/value-lineage/esbuild` | esbuild plugin that rewrites inline chains. See [Build plugin](BUILD_PLUGIN.md). |
-| `@gabrielvfonseca/value-lineage/transform` | `transformSource(code, filename)` for other bundlers. |
+| `@gabrielvfonseca/backstep/esbuild` | esbuild plugin that rewrites inline chains. See [Build plugin](BUILD_PLUGIN.md). |
+| `@gabrielvfonseca/backstep/transform` | `transformSource(code, filename)` for other bundlers. |

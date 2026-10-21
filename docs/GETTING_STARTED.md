@@ -1,6 +1,6 @@
 # Getting started
 
-`@gabrielvfonseca/value-lineage` shows how a value reached an unexpected state. You wrap an array
+`@gabrielvfonseca/backstep` shows how a value reached an unexpected state. You wrap an array
 pipeline in `trace`. When the result looks wrong, the library prints which step caused it and
 which elements it removed.
 
@@ -21,7 +21,7 @@ Authenticate in your user-level `~/.npmrc` (not the project file), with a token 
 ```
 
 ```sh
-npm install @gabrielvfonseca/value-lineage
+npm install @gabrielvfonseca/backstep
 ```
 
 Requirements: Node 20 or newer. The runtime `trace` has no dependencies and works in browsers. The
@@ -30,7 +30,7 @@ build plugin needs `esbuild` and `@babel/parser`, which are optional peer depend
 ## First trace
 
 ```ts
-import { trace } from "@gabrielvfonseca/value-lineage";
+import { trace } from "@gabrielvfonseca/backstep";
 
 const total = trace("order.total", order.items, (items) =>
   items.filter(isAvailable).map(getPrice).reduce((a, b) => a + b, 0),
@@ -61,7 +61,7 @@ Each dropped element is identified by its position in the original input (`#0`, 
 | --- | --- |
 | `NODE_ENV=development` or `test` | On |
 | `NODE_ENV` unset or `production` | Off |
-| `EXPLAIN=1` or `EXPLAIN=0` | Overrides the above |
+| `BACKSTEP=1` or `BACKSTEP=0` | Overrides the above |
 | Browser (no `process`) | Off until you call `enable()` |
 
 When tracing is off, `trace(name, input, fn)` is exactly `fn(input)`, so it is safe to leave in

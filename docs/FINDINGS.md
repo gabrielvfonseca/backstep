@@ -31,6 +31,6 @@ finding follows the step it belongs to.
 
 ## Adding a rule
 
-Rules live in `packages/explain/src/analyze.ts`. A rule reads the recorded step and its
+Rules live in `packages/backstep/src/analyze.ts`. A rule reads the recorded step and its
 `facts`. It does not re-scan the data. See the
-[rule-authoring skill](../skills/value-lineage-rule-authoring/SKILL.md) for the steps.
+[rule-authoring skill](../skills/backstep-rule-authoring/SKILL.md) for the steps.

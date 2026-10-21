@@ -11,7 +11,7 @@ function runTransformed(source: string): unknown {
 describe("transformed code behaves like the hand-written explicit form", () => {
   it("returns the same value as the explicit form", () => {
     const transformed = transformSource(
-      'import { trace } from "@gabrielvfonseca/value-lineage";\nconst items = [{ p: 2, ok: true }, { p: 5, ok: false }];\nconst result = trace("sum", () => items.filter((i) => i.ok).map((i) => i.p).reduce((a, b) => a + b, 0));',
+      'import { trace } from "@gabrielvfonseca/backstep";\nconst items = [{ p: 2, ok: true }, { p: 5, ok: false }];\nconst result = trace("sum", () => items.filter((i) => i.ok).map((i) => i.p).reduce((a, b) => a + b, 0));',
       "a.ts",
     ).code;
     const explicit = [
@@ -29,7 +29,7 @@ describe("transformed code behaves like the hand-written explicit form", () => {
     configure({ enabled: true, onReport: sink });
     try {
       const source = transformSource(
-        'import { trace } from "@gabrielvfonseca/value-lineage";\nconst order = { items: [{ ok: false }, { ok: false }] };\nconst result = trace("order.total", () => order.items.filter((i) => i.ok).map((i) => i.ok).reduce((a, b) => a + b, 0));',
+        'import { trace } from "@gabrielvfonseca/backstep";\nconst order = { items: [{ ok: false }, { ok: false }] };\nconst result = trace("order.total", () => order.items.filter((i) => i.ok).map((i) => i.ok).reduce((a, b) => a + b, 0));',
         "a.ts",
       ).code;
       expect(runTransformed(source)).toBe(0);

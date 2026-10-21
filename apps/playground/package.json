@@ -1,15 +1,15 @@
 {
-  "name": "@explain/playground",
+  "name": "@backstep/playground",
   "version": "0.0.0",
   "private": true,
-  "description": "Runnable examples that show explain on realistic bugs.",
+  "description": "Runnable examples that show backstep on realistic bugs.",
   "type": "module",
   "scripts": {
     "clean": "echo 'nothing to clean'",
-    "start": "EXPLAIN=1 node examples/order-total.mjs && EXPLAIN=1 node examples/sort-comparator.mjs",
+    "start": "BACKSTEP=1 node examples/order-total.mjs && BACKSTEP=1 node examples/sort-comparator.mjs",
     "typecheck": "echo 'playground is plain JavaScript'"
   },
   "dependencies": {
-    "@gabrielvfonseca/value-lineage": "workspace:*"
+    "@gabrielvfonseca/backstep": "workspace:*"
   }
 }

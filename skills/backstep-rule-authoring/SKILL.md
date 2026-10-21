@@ -1,6 +1,6 @@
 ---
-name: value-lineage-rule-authoring
-description: Add or change a divergence rule (a finding) in @gabrielvfonseca/value-lineage. Use when a new kind of array bug should be reported, when an existing finding needs a different threshold or message, or when a corpus case shows the library missing a bug. Covers recording facts in proxy.ts, the rule in analyze.ts, tests, and a corpus case.
+name: backstep-rule-authoring
+description: Add or change a divergence rule (a finding) in @gabrielvfonseca/backstep. Use when a new kind of array bug should be reported, when an existing finding needs a different threshold or message, or when a corpus case shows the library missing a bug. Covers recording facts in proxy.ts, the rule in analyze.ts, tests, and a corpus case.
 ---
 
 # Authoring a divergence rule
@@ -9,18 +9,18 @@ Use this skill when a bug class should produce a finding, or an existing finding
 
 ## Where things live
 
-- `packages/explain/src/proxy.ts`: records each operation as a step. Measures facts while the
+- `packages/backstep/src/proxy.ts`: records each operation as a step. Measures facts while the
   operation runs.
-- `packages/explain/src/types.ts`: `FindingCode`, `StepFacts`, `Step`.
-- `packages/explain/src/analyze.ts`: the rules. Each rule reads a step and its facts and adds a
+- `packages/backstep/src/types.ts`: `FindingCode`, `StepFacts`, `Step`.
+- `packages/backstep/src/analyze.ts`: the rules. Each rule reads a step and its facts and adds a
   finding.
-- `packages/explain/src/report.ts`: renders findings. No change is needed for a new code.
+- `packages/backstep/src/report.ts`: renders findings. No change is needed for a new code.
 - `packages/corpus/src/cases.ts`: realistic bugs the library must diagnose.
 
 ## Steps
 
 1. **Write the corpus case first.** Add a case that reproduces the bug, with the expected step and
-   code. Run `pnpm --filter @explain/corpus test` and confirm it fails.
+   code. Run `pnpm --filter @backstep/corpus test` and confirm it fails.
 
 2. **Record the facts you need in `proxy.ts`.** Facts are measured while the operation runs, so the
    analysis never re-scans data. Add a field to `StepFacts` in `types.ts`, set its default in
@@ -36,7 +36,7 @@ Use this skill when a bug class should produce a finding, or an existing finding
 
    The message should state what happened and the likely cause, in plain words.
 
-5. **Add unit tests** in `packages/explain/tests/rules.test.ts`. Cover the rule firing, and a
+5. **Add unit tests** in `packages/backstep/tests/rules.test.ts`. Cover the rule firing, and a
    nearby case where it must stay quiet.
 
 6. **Run the full check**: `pnpm lint && pnpm typecheck && pnpm test`. The corpus case must pass.

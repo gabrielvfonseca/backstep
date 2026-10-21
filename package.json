@@ -1,5 +1,5 @@
 {
-  "name": "explain-monorepo",
+  "name": "backstep-monorepo",
   "private": true,
   "scripts": {
     "bench": "turbo run bench",

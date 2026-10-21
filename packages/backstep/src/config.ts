@@ -1,11 +1,11 @@
-import { ExplainError } from "./errors.js";
+import { BackstepError } from "./errors.js";
 import { DEFAULT_REDACT_KEYS, type FormatOptions } from "./format.js";
 import type { TraceReport } from "./report.js";
 
 const TRUTHY_FLAG = /^(1|true|yes|on)$/i;
 const FALSY_FLAG = /^(0|false|no|off)$/i;
 
-export interface ExplainConfig {
+export interface BackstepConfig {
   /** Emit a report for every trace, not only when a divergence is found. */
   readonly always: boolean;
   /** When false, `trace` runs the callback directly and records nothing. */
@@ -20,11 +20,11 @@ export interface ExplainConfig {
   readonly redactKeys: RegExp;
 }
 
-export type ConfigOptions = Partial<ExplainConfig>;
+export type ConfigOptions = Partial<BackstepConfig>;
 
-let current: ExplainConfig = defaults();
+let current: BackstepConfig = defaults();
 
-export function getConfig(): ExplainConfig {
+export function getConfig(): BackstepConfig {
   return current;
 }
 
@@ -32,22 +32,22 @@ export function getConfig(): ExplainConfig {
  * Updates the global configuration. Options merge into the current values and are validated
  * before they take effect.
  */
-export function configure(options: ConfigOptions = {}): ExplainConfig {
-  const merged: ExplainConfig = { ...current, ...options };
+export function configure(options: ConfigOptions = {}): BackstepConfig {
+  const merged: BackstepConfig = { ...current, ...options };
   if (!(merged.redactKeys instanceof RegExp)) {
-    throw new ExplainError("redactKeys must be a RegExp");
+    throw new BackstepError("redactKeys must be a RegExp");
   }
-  const next: ExplainConfig = { ...merged, redactKeys: withoutStatefulFlags(merged.redactKeys) };
+  const next: BackstepConfig = { ...merged, redactKeys: withoutStatefulFlags(merged.redactKeys) };
   validate(next);
   current = next;
   return current;
 }
 
-export function enable(): ExplainConfig {
+export function enable(): BackstepConfig {
   return configure({ enabled: true });
 }
 
-export function disable(): ExplainConfig {
+export function disable(): BackstepConfig {
   return configure({ enabled: false });
 }
 
@@ -56,7 +56,7 @@ export function resetConfig(): void {
   current = defaults();
 }
 
-export function toFormatOptions(config: ExplainConfig): FormatOptions {
+export function toFormatOptions(config: BackstepConfig): FormatOptions {
   return {
     maxDepth: config.maxDepth,
     maxItems: config.maxItems,
@@ -65,7 +65,7 @@ export function toFormatOptions(config: ExplainConfig): FormatOptions {
   };
 }
 
-function defaults(): ExplainConfig {
+function defaults(): BackstepConfig {
   return {
     always: false,
     enabled: resolveEnabled(),
@@ -79,7 +79,7 @@ function defaults(): ExplainConfig {
 }
 
 /**
- * Tracing is on in development and test, and off in production. `EXPLAIN=1` or `EXPLAIN=0`
+ * Tracing is on in development and test, and off in production. `BACKSTEP=1` or `BACKSTEP=0`
  * overrides this. With no `process` object (browsers), tracing starts off until configured.
  */
 function resolveEnabled(): boolean {
@@ -87,7 +87,7 @@ function resolveEnabled(): boolean {
   if (!env) {
     return false;
   }
-  const flag = env.EXPLAIN;
+  const flag = env.BACKSTEP;
   if (flag !== undefined) {
     if (TRUTHY_FLAG.test(flag)) {
       return true;
@@ -128,19 +128,19 @@ function withoutStatefulFlags(pattern: RegExp): RegExp {
   return new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, ""));
 }
 
-function validate(config: ExplainConfig): void {
+function validate(config: BackstepConfig): void {
   assertInt("maxSamples", config.maxSamples, 0, 1000);
   assertInt("maxDepth", config.maxDepth, 0, 20);
   assertInt("maxItems", config.maxItems, 0, 1000);
   assertInt("maxStringLength", config.maxStringLength, 0, 10_000);
   if (config.onReport !== null && typeof config.onReport !== "function") {
-    throw new ExplainError("onReport must be a function or null");
+    throw new BackstepError("onReport must be a function or null");
   }
 }
 
 function assertInt(name: string, value: number, min: number, max: number): void {
   if (!Number.isInteger(value) || value < min || value > max) {
-    throw new ExplainError(
+    throw new BackstepError(
       `${name} must be an integer between ${min} and ${max}, received ${value}`,
     );
   }

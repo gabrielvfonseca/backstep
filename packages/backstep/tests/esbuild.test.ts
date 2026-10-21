@@ -11,7 +11,7 @@ describe("valueLineage esbuild plugin", () => {
   let dir = "";
 
   beforeEach(async () => {
-    dir = await mkdtemp(join(tmpdir(), "value-lineage-"));
+    dir = await mkdtemp(join(tmpdir(), "backstep-"));
   });
 
   afterEach(async () => {
@@ -24,7 +24,7 @@ describe("valueLineage esbuild plugin", () => {
     await writeFile(
       entry,
       [
-        'import { trace } from "@gabrielvfonseca/value-lineage";',
+        'import { trace } from "@gabrielvfonseca/backstep";',
         "const order = { items: [{ stock: 0 }, { stock: 0 }] };",
         'export const total = trace("order.total", () =>',
         "  order.items.filter((i) => i.stock > 0).map((i) => i.stock).reduce((a, b) => a + b, 0),",
@@ -34,7 +34,7 @@ describe("valueLineage esbuild plugin", () => {
     );
 
     const result = await esbuild.build({
-      alias: { "@gabrielvfonseca/value-lineage": libraryEntry },
+      alias: { "@gabrielvfonseca/backstep": libraryEntry },
       bundle: true,
       entryPoints: [entry],
       format: "cjs",
@@ -44,7 +44,7 @@ describe("valueLineage esbuild plugin", () => {
       write: false,
     });
     const code = result.outputFiles[0]?.text ?? "";
-    expect(code).toContain("__explain_input");
+    expect(code).toContain("__backstep_input");
 
     const warn = vi.fn();
     const originalWarn = console.warn;
@@ -73,6 +73,6 @@ describe("valueLineage esbuild plugin", () => {
       write: false,
     });
     expect(result.outputFiles[0]?.text).toContain("x * 2");
-    expect(result.outputFiles[0]?.text).not.toContain("__explain_input");
+    expect(result.outputFiles[0]?.text).not.toContain("__backstep_input");
   });
 });

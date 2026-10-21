@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  BACKSTEP_REPORT,
+  BackstepError,
   configure,
-  EXPLAIN_REPORT,
-  ExplainError,
   getReport,
   resetConfig,
   trace,
@@ -104,7 +104,7 @@ describe("trace", () => {
     const report = getReport(caught);
     expect(report?.divergedAt).toBe(0);
     expect(report?.steps[0]?.error?.message).toBe("bad input");
-    expect(Object.getOwnPropertySymbols(boom)).toContain(EXPLAIN_REPORT);
+    expect(Object.getOwnPropertySymbols(boom)).toContain(BACKSTEP_REPORT);
   });
 
   it("attaches a report to a thrown primitive without failing", () => {
@@ -116,7 +116,7 @@ describe("trace", () => {
   });
 
   it("rejects async callbacks with a clear error", () => {
-    expect(() => trace("async", [1], async (xs) => xs.length)).toThrow(ExplainError);
+    expect(() => trace("async", [1], async (xs) => xs.length)).toThrow(BackstepError);
     expect(() => trace("async", [1], async (xs) => xs.length)).toThrow(/Use traceAsync/);
   });
 

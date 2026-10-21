@@ -1,6 +1,6 @@
 # Releasing
 
-The package is published to GitHub Packages as `@gabrielvfonseca/value-lineage`. GitHub Packages
+The package is published to GitHub Packages as `@gabrielvfonseca/backstep`. GitHub Packages
 requires the scope to match the owning account.
 
 ## Before a release
@@ -31,7 +31,7 @@ requires the scope to match the owning account.
    never written to disk:
 
    ```sh
-   cd packages/explain
+   cd packages/backstep
    TOKEN="$(gh auth token)"
    env "npm_config_//npm.pkg.github.com/:_authToken=$TOKEN" \
      npm publish --registry https://npm.pkg.github.com --access restricted
@@ -41,7 +41,7 @@ requires the scope to match the owning account.
 4. Confirm the published version:
 
    ```sh
-   npm view @gabrielvfonseca/value-lineage version --registry https://npm.pkg.github.com
+   npm view @gabrielvfonseca/backstep version --registry https://npm.pkg.github.com
    ```
 
 The token needs the `write:packages` scope. Consumers need `read:packages` on the repository.

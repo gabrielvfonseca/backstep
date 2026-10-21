@@ -1,9 +1,9 @@
 ---
-name: value-lineage
-description: Debug an unexpected value in a JavaScript or TypeScript array pipeline using @gabrielvfonseca/value-lineage. Use when a filter, map, reduce, sort or find returns a surprising result such as 0, NaN, an empty array or the wrong order, or when the user asks how a value got into a state. Covers wrapping a pipeline in trace, reading the report, and the build plugin for inline chains.
+name: backstep
+description: Debug an unexpected value in a JavaScript or TypeScript array pipeline using @gabrielvfonseca/backstep. Use when a filter, map, reduce, sort or find returns a surprising result such as 0, NaN, an empty array or the wrong order, or when the user asks how a value got into a state. Covers wrapping a pipeline in trace, reading the report, and the build plugin for inline chains.
 ---
 
-# Debugging with value-lineage
+# Debugging with backstep
 
 Use this skill when an array pipeline produces a result that looks wrong and the cause is not
 obvious from reading the code.
@@ -17,7 +17,7 @@ obvious from reading the code.
    in place of the array:
 
    ```ts
-   import { trace } from "@gabrielvfonseca/value-lineage";
+   import { trace } from "@gabrielvfonseca/backstep";
 
    const total = trace("order.total", order.items, (items) =>
      items.filter(isAvailable).map(getPrice).reduce((a, b) => a + b, 0),
@@ -52,5 +52,5 @@ obvious from reading the code.
 - Redaction is by key name. Sensitive values under unusual keys are shown in full. Review reports
   before pasting them anywhere.
 - Async callbacks need `traceAsync`. Calling `trace` with a promise-returning callback throws.
-- Tracing is on only when `NODE_ENV` is `development` or `test`, unless `EXPLAIN=1` is set.
+- Tracing is on only when `NODE_ENV` is `development` or `test`, unless `BACKSTEP=1` is set.
 - Findings are heuristics. A flagged step may be intentional.

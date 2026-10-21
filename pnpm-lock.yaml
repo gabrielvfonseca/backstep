@@ -29,26 +29,11 @@ importers:
 
   apps/playground:
     dependencies:
-      '@gabrielvfonseca/value-lineage':
+      '@gabrielvfonseca/backstep':
         specifier: workspace:*
-        version: link:../../packages/explain
+        version: link:../../packages/backstep
 
-  packages/corpus:
-    devDependencies:
-      '@explain/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-      '@gabrielvfonseca/value-lineage':
-        specifier: workspace:*
-        version: link:../explain
-      typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
-      vitest:
-        specifier: ^4.1.12
-        version: 4.1.12(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(yaml@2.9.1))
-
-  packages/explain:
+  packages/backstep:
     devDependencies:
       '@arethetypeswrong/cli':
         specifier: ^0.18.5
@@ -56,7 +41,7 @@ importers:
       '@babel/parser':
         specifier: ^8.0.7
         version: 8.0.7
-      '@explain/tsconfig':
+      '@backstep/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
       '@types/node':
@@ -77,6 +62,21 @@ importers:
       tsup:
         specifier: ^9.0.0
         version: 9.0.0(postcss@8.5.31)(typescript@5.9.3)(yaml@2.9.1)
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.1.12
+        version: 4.1.12(@types/node@24.19.2)(@vitest/coverage-v8@4.1.12)(vite@8.3.5(@types/node@24.19.2)(esbuild@0.28.2)(yaml@2.9.1))
+
+  packages/corpus:
+    devDependencies:
+      '@backstep/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@gabrielvfonseca/backstep':
+        specifier: workspace:*
+        version: link:../backstep
       typescript:
         specifier: ~5.9.3
         version: 5.9.3

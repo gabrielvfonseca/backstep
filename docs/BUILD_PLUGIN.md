@@ -10,8 +10,8 @@ const total = trace("order.total", () => order.items.filter(isAvailable).map(get
 The build plugin rewrites that form at build time into the explicit form that is traced:
 
 ```ts
-const total = trace("order.total", order.items, (__explain_input) =>
-  __explain_input.filter(isAvailable).map(getPrice),
+const total = trace("order.total", order.items, (__backstep_input) =>
+  __backstep_input.filter(isAvailable).map(getPrice),
 );
 ```
 
@@ -19,7 +19,7 @@ const total = trace("order.total", order.items, (__explain_input) =>
 
 ```ts
 import { build } from "esbuild";
-import { valueLineage } from "@gabrielvfonseca/value-lineage/esbuild";
+import { valueLineage } from "@gabrielvfonseca/backstep/esbuild";
 
 await build({
   entryPoints: ["src/index.ts"],
@@ -41,7 +41,7 @@ npm install --save-dev esbuild @babel/parser
 For other bundlers, call `transformSource` from a plugin hook:
 
 ```ts
-import { transformSource } from "@gabrielvfonseca/value-lineage/transform";
+import { transformSource } from "@gabrielvfonseca/backstep/transform";
 
 const { code, changed } = transformSource(source, "path/to/file.ts");
 ```
@@ -50,7 +50,7 @@ const { code, changed } = transformSource(source, "path/to/file.ts");
 
 ## What gets rewritten
 
-- Only calls to `trace` imported from `@gabrielvfonseca/value-lineage`, or through a namespace import.
+- Only calls to `trace` imported from `@gabrielvfonseca/backstep`, or through a namespace import.
 - Only callbacks that take no arguments and return a chain of array methods over one receiver.
   Supported methods: `filter`, `map`, `flatMap`, `reduce`, `reduceRight`, `find`, `findIndex`,
   `findLast`, `findLastIndex`, `some`, `every`, `sort`, `toSorted`, `slice`.
@@ -64,7 +64,7 @@ const { code, changed } = transformSource(source, "path/to/file.ts");
 
 - The receiver must be a single expression. A receiver built across several statements is not
   rewritten.
-- If the rewritten source would collide with an existing `__explain_input` name, the file is left
+- If the rewritten source would collide with an existing `__backstep_input` name, the file is left
   unchanged.
 - Only the outermost `trace` call is rewritten. A `trace` nested inside a rewritten callback is
   left as written.

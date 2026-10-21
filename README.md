@@ -1,12 +1,12 @@
-# value-lineage
+# backstep
 
 **How did this value get into this state?**
 
-`@gabrielvfonseca/value-lineage` records how elements flow through an array pipeline. When the
+`@gabrielvfonseca/backstep` records how elements flow through an array pipeline. When the
 result looks wrong, it reports the step that caused it and the elements that step removed.
 
 ```ts
-import { trace } from "@gabrielvfonseca/value-lineage";
+import { trace } from "@gabrielvfonseca/backstep";
 
 const total = trace("order.total", order.items, (items) =>
   items.filter(isAvailable).map(getPrice).reduce((a, b) => a + b, 0),
@@ -14,11 +14,11 @@ const total = trace("order.total", order.items, (items) =>
 ```
 
 Documentation starts at [docs/INDEX.md](docs/INDEX.md). The package README is at
-[packages/explain/README.md](packages/explain/README.md).
+[packages/backstep/README.md](packages/backstep/README.md).
 
 ## Status
 
-- Version 0.1.0 is published to GitHub Packages as `@gabrielvfonseca/value-lineage`.
+- Version 0.1.0 is published to GitHub Packages as `@gabrielvfonseca/backstep`.
 - It has not yet been validated with real users. The bug corpus is written by the author. See
   [docs/VALIDATION.md](docs/VALIDATION.md).
 
@@ -26,7 +26,7 @@ Documentation starts at [docs/INDEX.md](docs/INDEX.md). The package README is at
 
 | Path                 | What it is                                                     |
 | -------------------- | -------------------------------------------------------------- |
-| `packages/explain`   | The library (`@gabrielvfonseca/value-lineage`)                 |
+| `packages/backstep`   | The library (`@gabrielvfonseca/backstep`)                 |
 | `packages/corpus`    | 14 realistic pipeline bugs the library must diagnose (private) |
 | `packages/tsconfig`  | Shared TypeScript configuration (private)                      |
 | `apps/playground`    | Runnable examples (private)                                    |

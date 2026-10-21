@@ -2,7 +2,7 @@
 
 ## What is tested
 
-- **Unit tests** (`packages/explain/tests`): 142 tests cover the proxy, each recorded operation,
+- **Unit tests** (`packages/backstep/tests`): 142 tests cover the proxy, each recorded operation,
   each finding, report rendering, configuration, redaction, async tracing, and the build
   transform.
 - **Property tests**: random pipelines produce the same result traced and untraced, and every

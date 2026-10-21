@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { configure, disable, ExplainError, enable, resetConfig, trace } from "../src/index.js";
+import { BackstepError, configure, disable, enable, resetConfig, trace } from "../src/index.js";
 
 type Env = Record<string, string | undefined>;
 
@@ -37,12 +37,12 @@ describe("configuration", () => {
     });
   });
 
-  it("lets EXPLAIN override NODE_ENV in both directions", () => {
-    withProcess({ EXPLAIN: "1", NODE_ENV: "production" }, false, () => {
+  it("lets BACKSTEP override NODE_ENV in both directions", () => {
+    withProcess({ BACKSTEP: "1", NODE_ENV: "production" }, false, () => {
       resetConfig();
       expect(configure().enabled).toBe(true);
     });
-    withProcess({ EXPLAIN: "off", NODE_ENV: "development" }, false, () => {
+    withProcess({ BACKSTEP: "off", NODE_ENV: "development" }, false, () => {
       resetConfig();
       expect(configure().enabled).toBe(false);
     });
@@ -62,9 +62,9 @@ describe("configuration", () => {
   it("merges options and validates them", () => {
     configure({ maxSamples: 2 });
     expect(configure().maxSamples).toBe(2);
-    expect(() => configure({ maxSamples: -1 })).toThrow(ExplainError);
+    expect(() => configure({ maxSamples: -1 })).toThrow(BackstepError);
     expect(() => configure({ maxDepth: 1.5 })).toThrow(/integer/);
-    expect(() => configure({ maxItems: 1_000_000 })).toThrow(ExplainError);
+    expect(() => configure({ maxItems: 1_000_000 })).toThrow(BackstepError);
     expect(() => configure({ onReport: "nope" as unknown as null })).toThrow(/onReport/);
     expect(() => configure({ redactKeys: "x" as unknown as RegExp })).toThrow(/RegExp/);
   });

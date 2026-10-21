@@ -1,8 +1,8 @@
-import { type Finding, type TraceReport, traceReport } from "@gabrielvfonseca/value-lineage";
+import { type Finding, type TraceReport, traceReport } from "@gabrielvfonseca/backstep";
 
 /**
  * A realistic bug in an array pipeline. `expected` names the step (0-based) where the report
- * should diverge and the finding that explains why. A case passes only if explain points at
+ * should diverge and the finding that explains why. A case passes only if backstep points at
  * that step, not merely at some step.
  */
 export interface BugCase {
@@ -180,7 +180,7 @@ function safeReport<I, R>(name: string, input: I, fn: (traced: I) => R): TraceRe
   try {
     return traceReport(name, input, fn).report;
   } catch (error) {
-    const attached = (error as Record<symbol, unknown>)[Symbol.for("explain.report")];
+    const attached = (error as Record<symbol, unknown>)[Symbol.for("backstep.report")];
     if (attached && typeof attached === "object") {
       return attached as TraceReport;
     }
