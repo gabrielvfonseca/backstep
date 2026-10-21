@@ -14,7 +14,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gabrielvfonseca/explain.git",
+    "url": "git+https://github.com/gabrielvfonseca/backstep.git",
     "directory": "packages/backstep"
   },
   "license": "MIT",
