@@ -6,12 +6,12 @@ unexpected result came from. The published package is documented in
 
 ## Monorepo
 
-| Path               | What it is                                                           |
-| ------------------ | -------------------------------------------------------------------- |
-| `packages/explain` | The library, published to npm as `explain`                           |
-| `packages/corpus`  | Ten realistic pipeline bugs that the library must diagnose (private) |
-| `apps/playground`  | Runnable examples (private)                                          |
-| `tooling/tsconfig` | Shared TypeScript configuration (private)                            |
+| Path                | What it is                                                           |
+| ------------------- | -------------------------------------------------------------------- |
+| `packages/explain`  | The library, published to npm as `explain`                           |
+| `packages/corpus`   | Ten realistic pipeline bugs that the library must diagnose (private) |
+| `apps/playground`   | Runnable examples (private)                                          |
+| `packages/tsconfig` | Shared TypeScript configuration (private)                            |
 
 Built with pnpm workspaces and Turborepo, with Biome, Vitest, tsup, Changesets, publint and
 @arethetypeswrong/cli.
