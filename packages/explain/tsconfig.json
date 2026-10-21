@@ -2,7 +2,8 @@
   "extends": "@explain/tsconfig/library.json",
   "compilerOptions": {
     "rootDir": ".",
-    "noEmit": true
+    "noEmit": true,
+    "types": ["node"]
   },
   "include": ["src", "tests", "bench", "tsup.config.ts", "vitest.config.ts"]
 }

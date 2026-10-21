@@ -29,7 +29,27 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./transform": {
+      "import": {
+        "types": "./dist/transform.d.ts",
+        "default": "./dist/transform.js"
+      },
+      "require": {
+        "types": "./dist/transform.d.cts",
+        "default": "./dist/transform.cjs"
+      }
+    },
+    "./esbuild": {
+      "import": {
+        "types": "./dist/esbuild.d.ts",
+        "default": "./dist/esbuild.js"
+      },
+      "require": {
+        "types": "./dist/esbuild.d.cts",
+        "default": "./dist/esbuild.cjs"
+      }
+    }
   },
   "files": [
     "dist",
@@ -62,6 +82,21 @@
     "publint": "^0.3.25",
     "tsup": "^9.0.0",
     "typescript": "~5.9.3",
-    "vitest": "^4.1.12"
+    "vitest": "^4.1.12",
+    "@babel/parser": "^8.0.7",
+    "esbuild": "^0.28.2",
+    "@types/node": "^24.0.0"
+  },
+  "peerDependencies": {
+    "@babel/parser": ">=7.20.0",
+    "esbuild": ">=0.17.0"
+  },
+  "peerDependenciesMeta": {
+    "@babel/parser": {
+      "optional": true
+    },
+    "esbuild": {
+      "optional": true
+    }
   }
 }

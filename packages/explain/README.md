@@ -106,6 +106,45 @@ try {
 }
 ```
 
+### Build plugin for inline chains
+
+Writing `trace("name", () => order.items.filter(...).map(...))` reads naturally, but the runtime
+cannot see inside the callback. The build plugin rewrites that form at build time into the
+explicit-input form, so it is traced:
+
+```ts
+// your source
+const total = trace("order.total", () => order.items.filter(isAvailable).map(getPrice));
+
+// after the plugin
+const total = trace("order.total", order.items, (__explain_input) =>
+  __explain_input.filter(isAvailable).map(getPrice),
+);
+```
+
+Enable it in esbuild (and tsup, which uses esbuild):
+
+```ts
+import { valueLineage } from "value-lineage/esbuild";
+
+build({ plugins: [valueLineage()] });
+```
+
+The plugin only touches files that import `trace` from `value-lineage` (or through a namespace
+import), and only callbacks that take no arguments and whose body is a chain of array methods over
+one receiver. Other calls are left exactly as written. Files under `node_modules` are skipped.
+
+For other bundlers, the same rewrite is available as a plain function:
+
+```ts
+import { transformSource } from "value-lineage/transform";
+
+const { code, changed } = transformSource(source, "path/to/file.ts");
+```
+
+The plugin needs `esbuild` (for `value-lineage/esbuild`) and `@babel/parser` (for both entries).
+Both are optional peer dependencies, so the runtime `trace` has no dependencies.
+
 ### Configuration
 
 ```ts
@@ -167,9 +206,11 @@ Findings with severity `error` or `warning` count as divergence. The first such 
 
 - **Arrays only.** `trace` records steps for arrays. Maps, sets and plain objects pass through
   with no steps. For an object, call `Object.entries(obj)` and trace the resulting array.
-- **You pass the input explicitly.** `trace("name", input, fn)` must be given the array you want
-  traced. A plain expression such as `order.items.filter(...)` inside `fn` is not traced. This is a
-  deliberate trade-off: no compiler plugin and no changes to `Array.prototype`.
+- **Inline chains need the build plugin, or an explicit input.** Without the plugin, only the array
+  passed as `input` is traced, so `trace("name", () => order.items.filter(...))` records nothing.
+  With the plugin (below), that form is rewritten to trace `order.items`. Chains the plugin cannot
+  see, such as a receiver computed across several statements, still need the explicit form.
+  The library never changes `Array.prototype`.
 - **Async callbacks need `traceAsync`.** `trace` rejects a promise-returning callback with an
   `ExplainError`. Inside `traceAsync`, the array callbacks (`filter`, `map`, …) must stay
   synchronous, as native array methods are.
