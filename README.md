@@ -1,6 +1,6 @@
-# Backstep
+![Backstep](banner.jpg)
 
-**How did this value get into this state?**
+# Trace JavaScript array pipelines, track element origins, and pinpoint suspicious transformations.
 
 `backstep` records how elements flow through an array pipeline. When the
 result looks wrong, it reports the step that caused it and the elements that step removed.

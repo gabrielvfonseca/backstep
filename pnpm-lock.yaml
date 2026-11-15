@@ -27,12 +27,6 @@ importers:
         specifier: 8.0.1
         version: 8.0.1(@biomejs/biome@2.5.15)
 
-  apps/playground:
-    dependencies:
-      backstep:
-        specifier: workspace:*
-        version: link:../../packages/backstep
-
   packages/backstep:
     devDependencies:
       '@arethetypeswrong/cli':
